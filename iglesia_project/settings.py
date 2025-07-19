@@ -199,6 +199,13 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 #     }
 # }
 
+# Configurar PyMySQL como reemplazo de MySQLdb
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
