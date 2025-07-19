@@ -298,28 +298,24 @@ class CertificadoAdmin(admin.ModelAdmin):
 class PlantillaMensajeAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'tipo', 'fecha_creacion', 'activa')
     list_filter = ('tipo', 'activa', 'fecha_creacion')
-    search_fields = ('nombre', 'asunto', 'contenido')
-    readonly_fields = ('fecha_creacion', 'fecha_modificacion')
+    search_fields = ('nombre', 'asunto', 'contenido_html')
+    readonly_fields = ('fecha_creacion',)  # Solo fecha_creacion existe
     
     fieldsets = (
         ('📝 Información Básica', {
-            'fields': ('nombre', 'tipo', 'activa'),
+            'fields': ('nombre', 'descripcion', 'tipo', 'activa'),
             'classes': ('wide',)
         }),
-        ('📧 Contenido del Email', {
-            'fields': ('asunto', 'contenido'),
+        ('📧 Contenido del Mensaje', {
+            'fields': ('asunto', 'contenido_html', 'contenido_texto'),
             'classes': ('wide',)
         }),
-        ('📱 Contenido SMS', {
-            'fields': ('contenido_sms',),
-            'classes': ('wide',)
-        }),
-        ('🔧 Variables y Configuración', {
-            'fields': ('variables_disponibles', 'configuracion_envio'),
+        ('🔧 Configuración', {
+            'fields': ('variables_disponibles', 'creado_por'),
             'classes': ('collapse',)
         }),
         ('📅 Fechas', {
-            'fields': ('fecha_creacion', 'fecha_modificacion'),
+            'fields': ('fecha_creacion',),
             'classes': ('collapse',)
         }),
     )
@@ -328,7 +324,7 @@ class PlantillaMensajeAdmin(admin.ModelAdmin):
 class NotificacionAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'destinatario', 'tipo', 'leida', 'fecha_creacion')
     list_filter = ('tipo', 'leida', 'fecha_creacion')
-    search_fields = ('titulo', 'destinatario', 'mensaje')
+    search_fields = ('titulo', 'destinatario__nombre', 'mensaje')  # Corregido
     readonly_fields = ('fecha_creacion', 'fecha_lectura')
     
     fieldsets = (
@@ -337,15 +333,15 @@ class NotificacionAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('👤 Destinatario', {
-            'fields': ('destinatario', 'email_destinatario'),
+            'fields': ('destinatario',),  # Removido email_destinatario
             'classes': ('wide',)
         }),
         ('📊 Estado', {
-            'fields': ('leida', 'fecha_lectura'),
+            'fields': ('leida', 'fecha_lectura', 'mostrar_hasta', 'requiere_accion', 'url_accion'),
             'classes': ('wide',)
         }),
         ('📅 Fechas', {
-            'fields': ('fecha_creacion',),
+            'fields': ('fecha_creacion', 'creado_por'),
             'classes': ('collapse',)
         }),
     )
