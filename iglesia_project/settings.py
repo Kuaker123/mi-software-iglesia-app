@@ -356,22 +356,6 @@ LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 
-
-## 🚀 **CONTINUEMOS CON EL DESPLIEGUE - PASOS RESTANTES**
-
-Perfecto, entiendo que quieres proceder con el despliegue y corregir los errores en versiones futuras. Continuemos con los pasos restantes del proceso de despliegue.
-
-### ✅ **ESTADO ACTUAL COMPLETADO:**
-- ✅ Paso 1: Verificación del sistema (`python manage.py check`)
-- ✅ Paso 2: Preparación de base de datos (migraciones, superusuario, estáticos)
-- ⚠️ Paso 3: Pruebas finales (con errores conocidos, pero funcional)
-
-### 🎯 **PASO 4: CONFIGURACIÓN PARA PRODUCCIÓN**
-
-#### 4.1 Actualizar settings.py para producción:
-```python
-# Agregar al final del archivo o modificar las configuraciones existentes:
-
 # Configuración de producción
 import os
 from pathlib import Path
@@ -388,17 +372,58 @@ ALLOWED_HOSTS = [
 ]
 
 # Base de datos para producción
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
+# Database - Configuración actualizada para Railway
+import dj_database_url
+
+if env('USE_MYSQL', default=False) or 'DATABASE_URL' in os.environ:
+    # Configuración para Railway con MySQL
+    if 'DATABASE_URL' in os.environ:
+        DATABASES = {
+            'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        }
+    else:
+        # Configuración manual de MySQL
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': env('DB_NAME', default='mi_software_iglesia'),
+                'USER': env('DB_USER', default='django_user'),
+                'PASSWORD': env('DB_PASSWORD', default=''),
+                'HOST': env('DB_HOST', default='127.0.0.1'),
+                'PORT': env('DB_PORT', default='3306'),
+                'OPTIONS': {
+                    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                    'charset': 'utf8mb4',
+                },
+                'CONN_MAX_AGE': 600,
+            }
+        }
+elif env('USE_POSTGRESQL', default=False):
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME', default='iglesia_db'),
+            'USER': env('DB_USER', default='iglesia_user'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST', default='localhost'),
+            'PORT': env('DB_PORT', default='5432'),
+            'OPTIONS': {
+                'connect_timeout': 10,
+                'options': '-c default_transaction_isolation=read_committed'
+            },
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
+        }
     }
 else:
-    # Configuración local existente
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+            'OPTIONS': {
+                'timeout': 20,
+                'check_same_thread': False,
+            }
         }
     }
 
@@ -450,4 +475,3 @@ LOGGING = {
         },
     },
 }
-```
