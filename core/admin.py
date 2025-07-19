@@ -299,7 +299,7 @@ class PlantillaMensajeAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'tipo', 'fecha_creacion', 'activa')
     list_filter = ('tipo', 'activa', 'fecha_creacion')
     search_fields = ('nombre', 'asunto', 'contenido_html')
-    readonly_fields = ('fecha_creacion',)  # Solo fecha_creacion existe
+    readonly_fields = ('fecha_creacion',)
     
     fieldsets = (
         ('📝 Información Básica', {
