@@ -423,16 +423,19 @@ elif env('USE_POSTGRESQL', default=False):
         }
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-            'OPTIONS': {
-                'timeout': 20,
-                'check_same_thread': False,
+    # Comentar la configuración de MySQL temporalmente
+    if os.getenv('DATABASE_URL'):
+        DATABASES = {
+            'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
+        }
+    else:
+        # Usar SQLite por defecto (más simple para empezar)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
             }
         }
-    }
 
 # Configuración de archivos estáticos para producción
 STATIC_URL = '/static/'

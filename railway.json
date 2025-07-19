@@ -4,7 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn iglesia_project.wsgi:application",
-    "healthcheckPath": "/"
+    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn iglesia_project.wsgi:application --bind 0.0.0.0:$PORT"
   }
 }
