@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Certificado - Sistema Iglesia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .alert-warning {
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white"><i class="fas fa-church"></i> Iglesia</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_miembros' %}">
+                                <i class="fas fa-users"></i> Miembros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_eventos' %}">
+                                <i class="fas fa-calendar"></i> Eventos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_contribuciones' %}">
+                                <i class="fas fa-donate"></i> Contribuciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white active bg-white bg-opacity-25" href="{% url 'listar_certificados' %}">
+                                <i class="fas fa-certificate"></i> Certificados
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="fas fa-edit"></i> Editar Certificado {{ certificado.numero_certificado }}</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="{% url 'detalle_certificado' certificado.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver al Detalle
+                            </a>
+                            <a href="{% url 'listar_certificados' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-list"></i> Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {% if certificado.estado == 'emitido' %}
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Atención:</strong> Este certificado ya ha sido emitido. Los cambios pueden afectar la validez del documento.
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <!-- Formulario -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-edit"></i> Información del Certificado</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.tipo_certificado.id_for_label }}" class="form-label">
+                                                <i class="fas fa-tag"></i> Tipo de Certificado *
+                                            </label>
+                                            {{ form.tipo_certificado }}
+                                            {% if form.tipo_certificado.errors %}
+                                                <div class="text-danger small">{{ form.tipo_certificado.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.miembro.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user"></i> Miembro *
+                                            </label>
+                                            {{ form.miembro }}
+                                            {% if form.miembro.errors %}
+                                                <div class="text-danger small">{{ form.miembro.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.fecha_evento_certificado.id_for_label }}" class="form-label">
+                                                <i class="fas fa-calendar"></i> Fecha del Evento
+                                            </label>
+                                            {{ form.fecha_evento_certificado }}
+                                            {% if form.fecha_evento_certificado.errors %}
+                                                <div class="text-danger small">{{ form.fecha_evento_certificado.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.id_evento.id_for_label }}" class="form-label">
+                                                <i class="fas fa-calendar-check"></i> Evento Relacionado
+                                            </label>
+                                            {{ form.id_evento }}
+                                            {% if form.id_evento.errors %}
+                                                <div class="text-danger small">{{ form.id_evento.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.contenido_personalizado.id_for_label }}" class="form-label">
+                                            <i class="fas fa-file-alt"></i> Contenido Personalizado
+                                        </label>
+                                        {{ form.contenido_personalizado }}
+                                        {% if form.contenido_personalizado.errors %}
+                                            <div class="text-danger small">{{ form.contenido_personalizado.errors }}</div>
+                                        {% endif %}
+                                        <div class="form-text">Puede usar variables como {nombre}, {apellido}, {fecha}, etc.</div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.pastor_nombre.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user-tie"></i> Pastor
+                                            </label>
+                                            {{ form.pastor_nombre }}
+                                            {% if form.pastor_nombre.errors %}
+                                                <div class="text-danger small">{{ form.pastor_nombre.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.testigo1_nombre.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user-check"></i> Testigo 1
+                                            </label>
+                                            {{ form.testigo1_nombre }}
+                                            {% if form.testigo1_nombre.errors %}
+                                                <div class="text-danger small">{{ form.testigo1_nombre.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.testigo2_nombre.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user-check"></i> Testigo 2
+                                            </label>
+                                            {{ form.testigo2_nombre }}
+                                            {% if form.testigo2_nombre.errors %}
+                                                <div class="text-danger small">{{ form.testigo2_nombre.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                            <i class="fas fa-sticky-note"></i> Observaciones
+                                        </label>
+                                        {{ form.observaciones }}
+                                        {% if form.observaciones.errors %}
+                                            <div class="text-danger small">{{ form.observaciones.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                            <i class="fas fa-flag"></i> Estado
+                                        </label>
+                                        {{ form.estado }}
+                                        {% if form.estado.errors %}
+                                            <div class="text-danger small">{{ form.estado.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <a href="{% url 'detalle_certificado' certificado.id %}" class="btn btn-outline-secondary me-md-2">
+                                            <i class="fas fa-times"></i> Cancelar
+                                        </a>
+                                        <button type="submit" name="action" value="guardar" class="btn btn-outline-primary me-md-2">
+                                            <i class="fas fa-save"></i> Guardar Cambios
+                                        </button>
+                                        {% if certificado.estado == 'borrador' %}
+                                        <button type="submit" name="action" value="emitir" class="btn btn-primary">
+                                            <i class="fas fa-certificate"></i> Guardar y Emitir
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Actual -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información Actual</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Número:</strong><br>
+                                    <span class="text-primary">{{ certificado.numero_certificado }}</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Estado Actual:</strong><br>
+                                    {% if certificado.estado == 'borrador' %}
+                                        <span class="badge bg-secondary">Borrador</span>
+                                    {% elif certificado.estado == 'emitido' %}
+                                        <span class="badge bg-success">Emitido</span>
+                                    {% elif certificado.estado == 'anulado' %}
+                                        <span class="badge bg-danger">Anulado</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <strong>Fecha de Creación:</strong><br>
+                                    {{ certificado.fecha_emision|date:"d/m/Y H:i" }}
+                                </div>
+
+                                {% if certificado.estado == 'emitido' %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Certificado Emitido</strong><br>
+                                    Este certificado ya ha sido emitido oficialmente.
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

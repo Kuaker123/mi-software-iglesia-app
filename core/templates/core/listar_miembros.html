@@ -1,0 +1,637 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}👥 Miembros - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">👥 Miembros</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+    
+    .stat-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .action-bar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .members-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .member-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .member-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .member-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+    }
+    
+    .member-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 auto 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .member-avatar::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    }
+    
+    .member-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .member-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .info-icon {
+        width: 20px;
+        text-align: center;
+        color: #667eea;
+    }
+    
+    .member-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .status-active {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+    
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+    
+    .member-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-warning {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background: #d97706;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #dc2626;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+    
+    .empty-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        opacity: 0.7;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #334155;
+    }
+    
+    .empty-text {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .page-link {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+    
+    .page-link:hover {
+        border-color: #667eea;
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .page-link.active {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-container {
+            max-width: none;
+        }
+        
+        .members-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="page-emoji">👥</span>
+        Gestión de Miembros
+    </h1>
+    <p class="page-subtitle">Administra y organiza la información de todos los miembros de tu iglesia</p>
+</div>
+
+<!-- Statistics Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <span class="stat-emoji">👨‍👩‍👧‍👦</span>
+        <span class="stat-number">{{ total_miembros }}</span>
+        <div class="stat-label">Total Miembros</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">✅</span>
+        <span class="stat-number">{{ miembros_activos }}</span>
+        <div class="stat-label">Activos</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">👶</span>
+        <span class="stat-number">{{ nuevos_mes }}</span>
+        <div class="stat-label">Nuevos Este Mes</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">🎂</span>
+        <span class="stat-number">{{ cumpleanos_mes }}</span>
+        <div class="stat-label">Cumpleaños</div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="🔍 Buscar miembros por nombre, email o teléfono..." id="searchInput">
+    </div>
+    
+    <div class="d-flex gap-2">
+        <a href="{% url 'crear_miembro' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Nuevo Miembro
+        </a>
+        <a href="#" class="btn-secondary">
+            <i class="fas fa-download"></i>
+            📊 Exportar
+        </a>
+    </div>
+</div>
+
+<!-- Members Grid -->
+{% if miembros %}
+    <div class="members-grid" id="membersGrid">
+        {% for miembro in miembros %}
+            <div class="member-card" data-search="{{ miembro.nombre|lower }} {{ miembro.apellido|lower }} {{ miembro.email|lower }} {{ miembro.telefono|default:'' }}">
+                <div class="member-avatar">
+                    {{ miembro.nombre|first }}{{ miembro.apellido|first }}
+                </div>
+                
+                <h3 class="member-name">{{ miembro.nombre }} {{ miembro.apellido }}</h3>
+                
+                <div class="member-status {% if miembro.activo %}status-active{% else %}status-inactive{% endif %}">
+                    <span>{% if miembro.activo %}✅ Activo{% else %}❌ Inactivo{% endif %}</span>
+                </div>
+                
+                <div class="member-info">
+                    <div class="info-item">
+                        <i class="fas fa-envelope info-icon"></i>
+                        <span>{{ miembro.email|default:"📧 Sin email" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-phone info-icon"></i>
+                        <span>{{ miembro.telefono|default:"📱 Sin teléfono" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <i class="fas fa-calendar info-icon"></i>
+                        <span>📅 {{ miembro.fecha_ingreso|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    {% if miembro.fecha_nacimiento %}
+                    <div class="info-item">
+                        <i class="fas fa-birthday-cake info-icon"></i>
+                        <span>🎂 {{ miembro.fecha_nacimiento|date:"d/m/Y" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="member-actions">
+                    <a href="{% url 'detalle_miembro' miembro.id_miembro %}" class="btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                        👁️ Ver
+                    </a>
+                    <a href="{% url 'editar_miembro' miembro.id_miembro %}" class="btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                        ✏️ Editar
+                    </a>
+                    <a href="{% url 'eliminar_miembro' miembro.id_miembro %}" class="btn-sm btn-danger" onclick="return confirm('⚠️ ¿Estás seguro de eliminar este miembro?')">
+                        <i class="fas fa-trash"></i>
+                        🗑️ Eliminar
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination-container">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="page-link">⏮️ Primera</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">⬅️ Anterior</a>
+            {% endif %}
+            
+            <span class="page-link active">📄 {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="page-link">Siguiente ➡️</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Última ⏭️</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+{% else %}
+    <div class="empty-state">
+        <span class="empty-emoji">👥</span>
+        <h3 class="empty-title">¡No hay miembros registrados!</h3>
+        <p class="empty-text">Comienza agregando el primer miembro de tu iglesia</p>
+        <a href="{% url 'crear_miembro' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Agregar Primer Miembro
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const memberCards = document.querySelectorAll('.member-card');
+    
+    memberCards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        if (searchData.includes(searchTerm)) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeIn 0.3s ease';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Add fade in animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
+</body>
+</html>

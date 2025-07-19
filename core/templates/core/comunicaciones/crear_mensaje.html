@@ -1,0 +1,110 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Crear Mensaje{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-envelope-open-text"></i>
+                        Crear Nuevo Mensaje
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.asunto.id_for_label }}">{{ form.asunto.label }}</label>
+                                    {{ form.asunto }}
+                                    {% if form.asunto.errors %}
+                                        <div class="text-danger">{{ form.asunto.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.prioridad.id_for_label }}">{{ form.prioridad.label }}</label>
+                                    {{ form.prioridad }}
+                                    {% if form.prioridad.errors %}
+                                        <div class="text-danger">{{ form.prioridad.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.contenido.id_for_label }}">{{ form.contenido.label }}</label>
+                            {{ form.contenido }}
+                            {% if form.contenido.errors %}
+                                <div class="text-danger">{{ form.contenido.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.lista_distribucion.id_for_label }}">{{ form.lista_distribucion.label }}</label>
+                                    {{ form.lista_distribucion }}
+                                    {% if form.lista_distribucion.errors %}
+                                        <div class="text-danger">{{ form.lista_distribucion.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.fecha_programada.id_for_label }}">{{ form.fecha_programada.label }}</label>
+                                    {{ form.fecha_programada }}
+                                    {% if form.fecha_programada.errors %}
+                                        <div class="text-danger">{{ form.fecha_programada.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Dejar vacío para envío inmediato</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Crear Mensaje
+                            </button>
+                            <a href="{% url 'listar_mensajes' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Configurar datepicker para fecha programada
+    $('#id_fecha_programada').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+        minDate: moment(),
+        locale: 'es'
+    });
+});
+</script>
+{% endblock %}

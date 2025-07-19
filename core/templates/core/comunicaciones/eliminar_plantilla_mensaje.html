@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Eliminar Plantilla{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card card-danger">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirmar Eliminación
+                    </h3>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h5><i class="icon fas fa-exclamation-triangle"></i> ¡Atención!</h5>
+                            Esta acción no se puede deshacer.
+                        </div>
+                        
+                        <p class="lead">¿Estás seguro de que deseas eliminar la plantilla?</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ plantilla.nombre }}</h5>
+                                <p class="card-text">
+                                    <strong>Tipo:</strong> {{ plantilla.get_tipo_display }}<br>
+                                    <strong>Asunto:</strong> {{ plantilla.asunto }}<br>
+                                    <strong>Descripción:</strong> {{ plantilla.descripcion|default:"Sin descripción" }}<br>
+                                    <strong>Creada:</strong> {{ plantilla.fecha_creacion|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sí, Eliminar Plantilla
+                        </button>
+                        <a href="{% url 'listar_plantillas_mensaje' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

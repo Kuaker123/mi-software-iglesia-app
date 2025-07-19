@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Certificados - Sistema Iglesia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-stats {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .badge-estado {
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white"><i class="fas fa-church"></i> Iglesia</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_miembros' %}">
+                                <i class="fas fa-users"></i> Miembros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_eventos' %}">
+                                <i class="fas fa-calendar"></i> Eventos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'listar_contribuciones' %}">
+                                <i class="fas fa-donate"></i> Contribuciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white active bg-white bg-opacity-25" href="{% url 'listar_certificados' %}">
+                                <i class="fas fa-certificate"></i> Certificados
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="fas fa-certificate"></i> Gestión de Certificados</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="{% url 'crear_certificado' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Nuevo Certificado
+                            </a>
+                            <a href="{% url 'gestionar_tipos_certificados' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-cog"></i> Tipos de Certificado
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card card-stats border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Certificados</h5>
+                                        <span class="h2 font-weight-bold mb-0">{{ total_certificados }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-white text-primary rounded-circle shadow">
+                                            <i class="fas fa-certificate"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card card-stats border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Este Mes</h5>
+                                        <span class="h2 font-weight-bold mb-0">{{ certificados_mes }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-white text-success rounded-circle shadow">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card card-stats border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Pendientes</h5>
+                                        <span class="h2 font-weight-bold mb-0">{{ certificados_pendientes }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-white text-warning rounded-circle shadow">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card card-stats border-0 shadow">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Tipos Activos</h5>
+                                        <span class="h2 font-weight-bold mb-0">{{ tipos_activos }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-white text-info rounded-circle shadow">
+                                            <i class="fas fa-tags"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="numero_certificado" class="form-label">Número de Certificado</label>
+                                <input type="text" class="form-control" id="numero_certificado" name="numero_certificado" 
+                                       value="{{ request.GET.numero_certificado }}" placeholder="CERT-0001">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="tipo_certificado" class="form-label">Tipo de Certificado</label>
+                                <select class="form-select" id="tipo_certificado" name="tipo_certificado">
+                                    <option value="">Todos los tipos</option>
+                                    {% for tipo in tipos_certificado %}
+                                        <option value="{{ tipo.id }}" 
+                                                {% if request.GET.tipo_certificado == tipo.id|stringformat:'s' %}selected{% endif %}>
+                                            {{ tipo.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="estado" class="form-label">Estado</label>
+                                <select class="form-select" id="estado" name="estado">
+                                    <option value="">Todos</option>
+                                    <option value="borrador" {% if request.GET.estado == 'borrador' %}selected{% endif %}>Borrador</option>
+                                    <option value="emitido" {% if request.GET.estado == 'emitido' %}selected{% endif %}>Emitido</option>
+                                    <option value="anulado" {% if request.GET.estado == 'anulado' %}selected{% endif %}>Anulado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="fecha_desde" class="form-label">Fecha Desde</label>
+                                <input type="date" class="form-control" id="fecha_desde" name="fecha_desde" 
+                                       value="{{ request.GET.fecha_desde }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="fecha_hasta" class="form-label">Fecha Hasta</label>
+                                <input type="date" class="form-control" id="fecha_hasta" name="fecha_hasta" 
+                                       value="{{ request.GET.fecha_hasta }}">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <a href="{% url 'listar_certificados' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de Certificados -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Lista de Certificados</h5>
+                        <span class="badge bg-primary">{{ certificados.count }} certificado{{ certificados.count|pluralize }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if certificados %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Tipo</th>
+                                            <th>Miembro</th>
+                                            <th>Fecha Emisión</th>
+                                            <th>Estado</th>
+                                            <th>Pastor</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for certificado in certificados %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ certificado.numero_certificado }}</strong>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">{{ certificado.tipo_certificado.nombre }}</span>
+                                                </td>
+                                                <td>
+                                                    <div>
+                                                        <strong>{{ certificado.miembro.nombre }} {{ certificado.miembro.apellido }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ certificado.miembro.cedula }}</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {{ certificado.fecha_emision|date:"d/m/Y" }}
+                                                    <br>
+                                                    <small class="text-muted">{{ certificado.fecha_emision|time:"H:i" }}</small>
+                                                </td>
+                                                <td>
+                                                    {% if certificado.estado == 'emitido' %}
+                                                        <span class="badge bg-success badge-estado">Emitido</span>
+                                                    {% elif certificado.estado == 'borrador' %}
+                                                        <span class="badge bg-warning badge-estado">Borrador</span>
+                                                    {% elif certificado.estado == 'anulado' %}
+                                                        <span class="badge bg-danger badge-estado">Anulado</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ certificado.pastor_nombre|default:"No asignado" }}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{% url 'detalle_certificado' certificado.id %}" 
+                                                           class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'editar_certificado' certificado.id %}" 
+                                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        {% if certificado.archivo_pdf %}
+                                                            <a href="{% url 'descargar_certificado' certificado.id %}" 
+                                                               class="btn btn-sm btn-outline-success" title="Descargar PDF">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'generar_pdf_certificado' certificado.id %}" 
+                                                               class="btn btn-sm btn-outline-info" title="Generar PDF">
+                                                                <i class="fas fa-file-pdf"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                        <a href="{% url 'eliminar_certificado' certificado.id %}" 
+                                                           class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                                           onclick="return confirm('¿Está seguro de eliminar este certificado?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-certificate fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay certificados registrados</h5>
+                                <p class="text-muted">Comience creando su primer certificado</p>
+                                <a href="{% url 'crear_certificado' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Crear Certificado
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

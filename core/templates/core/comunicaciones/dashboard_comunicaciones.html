@@ -1,0 +1,153 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Comunicaciones{% endblock %}
+
+{% block extra_css %}
+<style>
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.stat-card h3 {
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+}
+.recent-activity {
+    max-height: 400px;
+    overflow-y: auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Dashboard de Comunicaciones</h1>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <h3>{{ total_mensajes }}</h3>
+                <p class="mb-0">Mensajes Totales</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <h3>{{ mensajes_enviados }}</h3>
+                <p class="mb-0">Mensajes Enviados</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <h3>{{ listas_distribucion }}</h3>
+                <p class="mb-0">Listas de Distribución</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <h3>{{ notificaciones_pendientes }}</h3>
+                <p class="mb-0">Notificaciones Pendientes</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'crear_mensaje' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-envelope"></i> Nuevo Mensaje
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'crear_lista_distribucion' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-list"></i> Nueva Lista
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'crear_plantilla_mensaje' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-file-alt"></i> Nueva Plantilla
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'configuracion_comunicacion' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-cog"></i> Configuración
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Mensajes Recientes</h5>
+                </div>
+                <div class="card-body recent-activity">
+                    {% for mensaje in mensajes_recientes %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div>
+                            <strong>{{ mensaje.titulo }}</strong>
+                            <br>
+                            <small class="text-muted">{{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <div>
+                            <span class="badge badge-{% if mensaje.estado == 'enviado' %}success{% elif mensaje.estado == 'error' %}danger{% else %}warning{% endif %}">
+                                {{ mensaje.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay mensajes recientes.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Notificaciones Recientes</h5>
+                </div>
+                <div class="card-body recent-activity">
+                    {% for notificacion in notificaciones_recientes %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div>
+                            <strong>{{ notificacion.titulo }}</strong>
+                            <br>
+                            <small class="text-muted">{{ notificacion.destinatario }}</small>
+                        </div>
+                        <div>
+                            {% if notificacion.leida %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                                <i class="fas fa-circle text-warning"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No hay notificaciones recientes.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

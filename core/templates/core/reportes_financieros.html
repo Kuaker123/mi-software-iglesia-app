@@ -1,0 +1,201 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Reportes Financieros - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dashboard_financiero' %}">Dashboard Financiero</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Reportes Financieros</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    .report-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border-left: 4px solid #667eea;
+        transition: transform 0.2s ease;
+    }
+    .report-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .report-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .report-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    .report-description {
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    .btn-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 0.25rem;
+        transition: transform 0.2s ease;
+    }
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        color: white;
+    }
+    .btn-secondary-custom {
+        background: #6c757d;
+    }
+    .filters-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .form-group input, .form-group select {
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1 class="display-6">📊 Reportes Financieros</h1>
+    <p class="lead">Genera reportes detallados de las finanzas de la iglesia</p>
+</div>
+
+<div class="filters-section">
+    <h3>🔍 Filtros para Reportes</h3>
+    <form method="get">
+        <div class="filter-row">
+            <div class="form-group">
+                <label>📅 Fecha Inicio:</label>
+                <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>📅 Fecha Fin:</label>
+                <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>🏷️ Categoría:</label>
+                <select name="categoria" class="form-select">
+                    <option value="">Todas las categorías</option>
+                    <option value="Ingreso">Ingresos</option>
+                    <option value="Egreso">Egresos</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>📋 Tipo:</label>
+                <select name="tipo" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="Diezmo">Diezmo</option>
+                    <option value="Ofrenda">Ofrenda</option>
+                    <option value="Donacion">Donación</option>
+                    <option value="Gasto">Gasto</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">🔍 Aplicar Filtros</button>
+    </form>
+</div>
+
+<div class="reports-grid">
+    <div class="report-card">
+        <div class="report-icon">📈</div>
+        <div class="report-title">Reporte General</div>
+        <div class="report-description">
+            Resumen completo de ingresos y egresos con totales y estadísticas generales.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=general" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=general" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+    
+    <div class="report-card">
+        <div class="report-icon">📊</div>
+        <div class="report-title">Reporte por Categorías</div>
+        <div class="report-description">
+            Análisis detallado de contribuciones agrupadas por categorías y tipos.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=categorias" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=categorias" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+    
+    <div class="report-card">
+        <div class="report-icon">📅</div>
+        <div class="report-title">Reporte Mensual</div>
+        <div class="report-description">
+            Comparativo mensual de ingresos y egresos con tendencias y proyecciones.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=mensual" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=mensual" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+    
+    <div class="report-card">
+        <div class="report-icon">👥</div>
+        <div class="report-title">Reporte por Miembros</div>
+        <div class="report-description">
+            Detalle de contribuciones por miembro con totales individuales y estadísticas.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=miembros" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=miembros" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+    
+    <div class="report-card">
+        <div class="report-icon">💳</div>
+        <div class="report-title">Reporte por Método de Pago</div>
+        <div class="report-description">
+            Análisis de contribuciones según el método de pago utilizado.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=metodos" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=metodos" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+    
+    <div class="report-card">
+        <div class="report-icon">⚠️</div>
+        <div class="report-title">Reporte de Alertas</div>
+        <div class="report-description">
+            Identificación de patrones inusuales y alertas financieras importantes.
+        </div>
+        <a href="{% url 'exportar_finanzas' 'pdf' %}?tipo=alertas" class="btn-custom">📄 PDF</a>
+        <a href="{% url 'exportar_finanzas' 'csv' %}?tipo=alertas" class="btn-custom btn-secondary-custom">📊 CSV</a>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{% url 'dashboard_financiero' %}" class="btn btn-outline-primary me-2">🏠 Volver al Dashboard</a>
+    <a href="{% url 'listar_contribuciones' %}" class="btn btn-outline-secondary">📋 Ver Contribuciones</a>
+</div>
+{% endblock %}

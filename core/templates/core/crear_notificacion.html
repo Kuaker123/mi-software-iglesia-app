@@ -1,0 +1,165 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Crear Notificación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Crear Nueva Notificación</h3>
+                    <div class="card-tools">
+                        <a href="{% url 'listar_notificaciones' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver a Notificaciones
+                        </a>
+                    </div>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+                                    {{ form.titulo|add_class:"form-control" }}
+                                    {% if form.titulo.errors %}
+                                        <div class="text-danger">{{ form.titulo.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+                                    {{ form.tipo|add_class:"form-control" }}
+                                    {% if form.tipo.errors %}
+                                        <div class="text-danger">{{ form.tipo.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.mensaje.id_for_label }}">{{ form.mensaje.label }}</label>
+                            {{ form.mensaje|add_class:"form-control" }}
+                            {% if form.mensaje.errors %}
+                                <div class="text-danger">{{ form.mensaje.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.usuario.id_for_label }}">{{ form.usuario.label }}</label>
+                                    {{ form.usuario|add_class:"form-control" }}
+                                    {% if form.usuario.errors %}
+                                        <div class="text-danger">{{ form.usuario.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Deja vacío para enviar a todos los usuarios</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.enlace.id_for_label }}">{{ form.enlace.label }}</label>
+                                    {{ form.enlace|add_class:"form-control" }}
+                                    {% if form.enlace.errors %}
+                                        <div class="text-danger">{{ form.enlace.errors }}</div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Opcional: URL relacionada con la notificación</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Crear Notificación
+                        </button>
+                        <a href="{% url 'listar_notificaciones' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel de vista previa -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">Vista Previa</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="time-label">
+                            <span class="bg-info" id="preview-date">
+                                {{ "now"|date:"d M Y" }}
+                            </span>
+                        </div>
+                        <div>
+                            <i class="fas fa-info-circle bg-info" id="preview-icon"></i>
+                            <div class="timeline-item">
+                                <span class="time">
+                                    <i class="fas fa-clock"></i> {{ "now"|date:"H:i" }}
+                                    <span class="badge badge-primary ml-2">Nueva</span>
+                                </span>
+                                <h3 class="timeline-header" id="preview-title">
+                                    [Título de la notificación]
+                                    <small class="text-muted" id="preview-type">- Información</small>
+                                </h3>
+                                <div class="timeline-body" id="preview-message">
+                                    [Mensaje de la notificación]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Actualizar vista previa en tiempo real
+    function updatePreview() {
+        var titulo = $('#id_titulo').val() || '[Título de la notificación]';
+        var mensaje = $('#id_mensaje').val() || '[Mensaje de la notificación]';
+        var tipo = $('#id_tipo option:selected').text() || 'Información';
+        var tipoValue = $('#id_tipo').val() || 'info';
+        
+        $('#preview-title').html(titulo + ' <small class="text-muted">- ' + tipo + '</small>');
+        $('#preview-message').text(mensaje);
+        
+        // Actualizar colores según el tipo
+        var colorClass = 'bg-info';
+        var iconClass = 'fas fa-info-circle';
+        
+        if (tipoValue === 'error') {
+            colorClass = 'bg-danger';
+            iconClass = 'fas fa-exclamation-triangle';
+        } else if (tipoValue === 'advertencia') {
+            colorClass = 'bg-warning';
+            iconClass = 'fas fa-exclamation-circle';
+        } else if (tipoValue === 'exito') {
+            colorClass = 'bg-success';
+            iconClass = 'fas fa-check-circle';
+        }
+        
+        $('#preview-date').removeClass().addClass(colorClass);
+        $('#preview-icon').removeClass().addClass(iconClass + ' ' + colorClass);
+    }
+    
+    // Escuchar cambios en los campos
+    $('#id_titulo, #id_mensaje, #id_tipo').on('input change', updatePreview);
+    
+    // Actualizar vista previa inicial
+    updatePreview();
+});
+</script>
+{% endblock %}

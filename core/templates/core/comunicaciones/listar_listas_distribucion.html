@@ -1,0 +1,156 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Listas de Distribución{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Listas de Distribución</h1>
+                <a href="{% url 'crear_lista_distribucion' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Lista
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-6">
+                            <input type="text" name="busqueda" class="form-control" 
+                                   placeholder="Buscar por nombre o descripción..." 
+                                   value="{{ request.GET.busqueda }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="activa" class="form-control">
+                                <option value="">Todas las listas</option>
+                                <option value="true" {% if request.GET.activa == 'true' %}selected{% endif %}>Activas</option>
+                                <option value="false" {% if request.GET.activa == 'false' %}selected{% endif %}>Inactivas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <a href="{% url 'listar_listas_distribucion' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Limpiar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Distribución -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if listas %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Miembros</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Creación</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lista in listas %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ lista.nombre }}</strong>
+                                    </td>
+                                    <td>{{ lista.descripcion|truncatechars:50 }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ lista.obtener_miembros.count }} miembros</span>
+                                    </td>
+                                    <td>
+                                        {% if lista.activa %}
+                                            <span class="badge badge-success">Activa</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Inactiva</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ lista.fecha_creacion|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'detalle_lista_distribucion' lista.id %}" 
+                                               class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'editar_lista_distribucion' lista.id %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if listas.has_other_pages %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if listas.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ listas.previous_page_number }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.activa %}&activa={{ request.GET.activa }}{% endif %}">
+                                        Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in listas.paginator.page_range %}
+                                {% if listas.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.activa %}&activa={{ request.GET.activa }}{% endif %}">
+                                            {{ num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if listas.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ listas.next_page_number }}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}{% if request.GET.activa %}&activa={{ request.GET.activa }}{% endif %}">
+                                        Siguiente
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-list fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay listas de distribución</h5>
+                        <p class="text-muted">Crea tu primera lista de distribución para comenzar a enviar mensajes.</p>
+                        <a href="{% url 'crear_lista_distribucion' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primera Lista
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

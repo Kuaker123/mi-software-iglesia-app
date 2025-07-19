@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ grupo.nombre_grupo }} - Sistema Iglesia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #667eea;
+            margin-right: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #764ba2;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .grupo-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .grupo-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .grupo-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .info-item {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        .info-value {
+            color: #333;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f3f4;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .miembros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .miembro-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid #28a745;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .miembro-info {
+            flex-grow: 1;
+        }
+        .miembro-nombre {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .miembro-fecha {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .form-agregar {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        .errorlist {
+            color: #dc3545;
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🏛️ Sistema de Gestión Iglesia</h1>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="container">
+            <a href="{% url 'dashboard' %}">🏠 Inicio</a>
+            <a href="{% url 'listar_miembros' %}">👥 Miembros</a>
+            <a href="{% url 'listar_grupos' %}">👨‍👩‍👧‍👦 Grupos</a>
+            <a href="{% url 'listar_contribuciones' %}">💰 Contribuciones</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grupo-header">
+            <div class="grupo-title">
+                <h2>👨‍👩‍👧‍👦 {{ grupo.nombre_grupo }}</h2>
+                <div class="btn-group">
+                    <a href="{% url 'editar_grupo' grupo.id_grupo %}" class="btn btn-secondary">✏️ Editar</a>
+                    <a href="{% url 'eliminar_grupo' grupo.id_grupo %}" class="btn btn-danger">🗑️ Eliminar</a>
+                    <a href="{% url 'listar_grupos' %}" class="btn btn-primary">⬅️ Volver</a>
+                </div>
+            </div>
+            
+            <div class="grupo-info">
+                <div class="info-item">
+                    <div class="info-label">📝 Descripción</div>
+                    <div class="info-value">{{ grupo.descripcion|default:"Sin descripción" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">👤 Líder</div>
+                    <div class="info-value">{{ grupo.id_lider.nombre|default:"Sin asignar" }} {{ grupo.id_lider.apellido|default:"" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">📍 Ubicación</div>
+                    <div class="info-value">{{ grupo.ubicacion_geografica|default:"Sin ubicación" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">📅 Fecha de Creación</div>
+                    <div class="info-value">{{ grupo.fecha_creacion|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <h3>👥 Miembros del Grupo ({{ miembros_grupo.count }})</h3>
+            </div>
+            
+            <div class="form-agregar">
+                <h4>➕ Agregar Miembro al Grupo</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ form.id_miembro.id_for_label }}">{{ form.id_miembro.label }}</label>
+                        {{ form.id_miembro }}
+                        {{ form.id_miembro.errors }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.fecha_union.id_for_label }}">{{ form.fecha_union.label }}</label>
+                        {{ form.fecha_union }}
+                        {{ form.fecha_union.errors }}
+                    </div>
+                    <button type="submit" class="btn btn-success">➕ Agregar Miembro</button>
+                </form>
+            </div>
+            
+            {% if miembros_grupo %}
+                <div class="miembros-grid">
+                    {% for miembro_grupo in miembros_grupo %}
+                        <div class="miembro-card">
+                            <div class="miembro-info">
+                                <div class="miembro-nombre">
+                                    {{ miembro_grupo.id_miembro.nombre }} {{ miembro_grupo.id_miembro.apellido }}
+                                </div>
+                                <div class="miembro-fecha">
+                                    Se unió: {{ miembro_grupo.fecha_union|date:"d/m/Y" }}
+                                </div>
+                            </div>
+                            <a href="{% url 'quitar_miembro_grupo' grupo.id_grupo miembro_grupo.id_miembro.id_miembro %}" 
+                               class="btn btn-danger" style="padding: 0.5rem; font-size: 0.8rem;">❌</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>👥 No hay miembros en este grupo aún.</p>
+                    <p>Utiliza el formulario de arriba para agregar miembros.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

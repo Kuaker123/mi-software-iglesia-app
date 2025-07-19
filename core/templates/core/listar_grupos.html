@@ -1,0 +1,597 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}👥 Grupos - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">👥 Grupos</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '👥';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 8rem;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed, #a855f7);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+    }
+    
+    .stat-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #8b5cf6;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .action-bar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(139, 92, 246, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .groups-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .group-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .group-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+    }
+    
+    .group-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+    }
+    
+    .group-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .group-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .group-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    }
+    
+    .group-info {
+        flex: 1;
+    }
+    
+    .group-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .group-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+    }
+    
+    .group-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .detail-icon {
+        width: 20px;
+        text-align: center;
+        color: #8b5cf6;
+    }
+    
+    .group-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #8b5cf6;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+    
+    .stat-label-small {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .group-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-warning {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background: #d97706;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #dc2626;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+    
+    .empty-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        opacity: 0.7;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #334155;
+    }
+    
+    .empty-text {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-container {
+            max-width: none;
+        }
+        
+        .groups-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="page-emoji">👥</span>
+        Gestión de Grupos
+    </h1>
+    <p class="page-subtitle">Organiza y administra todos los grupos de tu iglesia</p>
+</div>
+
+<!-- Statistics Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <span class="stat-emoji">👥</span>
+        <span class="stat-number">{{ total_grupos }}</span>
+        <div class="stat-label">Total Grupos</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">✅</span>
+        <span class="stat-number">{{ grupos_activos }}</span>
+        <div class="stat-label">Activos</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">👨‍👩‍👧‍👦</span>
+        <span class="stat-number">{{ total_miembros_grupos }}</span>
+        <div class="stat-label">Miembros en Grupos</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">📊</span>
+        <span class="stat-number">{{ promedio_miembros }}</span>
+        <div class="stat-label">Promedio por Grupo</div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="🔍 Buscar grupos por nombre o líder..." id="searchInput">
+    </div>
+    
+    <div class="d-flex gap-2">
+        <a href="{% url 'crear_grupo' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Nuevo Grupo
+        </a>
+    </div>
+</div>
+
+<!-- Groups Grid -->
+{% if grupos %}
+    <div class="groups-grid" id="groupsGrid">
+        {% for grupo in grupos %}
+            <div class="group-card" data-search="{{ grupo.nombre_grupo|lower }} {{ grupo.id_lider.nombre|default:''|lower }} {{ grupo.id_lider.apellido|default:''|lower }}">
+                <div class="group-header">
+                    <div class="group-icon">
+                        {{ grupo.nombre_grupo|first }}
+                    </div>
+                    <div class="group-info">
+                        <h3 class="group-name">{{ grupo.nombre_grupo }}</h3>
+                        <span class="group-type">
+                            👥 {{ grupo.tipo_grupo|default:"Grupo General" }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="group-details">
+                    <div class="detail-item">
+                        <i class="fas fa-user-tie detail-icon"></i>
+                        <span>
+                            {% if grupo.id_lider %}
+                                👨‍💼 {{ grupo.id_lider.nombre }} {{ grupo.id_lider.apellido }}
+                            {% else %}
+                                👤 Sin líder asignado
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <i class="fas fa-calendar detail-icon"></i>
+                        <span>📅 Creado: {{ grupo.fecha_creacion|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    {% if grupo.descripcion %}
+                    <div class="detail-item">
+                        <i class="fas fa-info-circle detail-icon"></i>
+                        <span>📝 {{ grupo.descripcion|truncatechars:50 }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="group-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ grupo.total_miembros|default:0 }}</span>
+                        <div class="stat-label-small">👥 Miembros</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ grupo.eventos_mes|default:0 }}</span>
+                        <div class="stat-label-small">📅 Eventos</div>
+                    </div>
+                </div>
+                
+                <div class="group-actions">
+                    <a href="{% url 'detalle_grupo' grupo.id_grupo %}" class="btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                        👁️ Ver
+                    </a>
+                    <a href="{% url 'editar_grupo' grupo.id_grupo %}" class="btn-sm btn-warning">
+                        <i class="fas fa-edit"></i>
+                        ✏️ Editar
+                    </a>
+                    <a href="{% url 'eliminar_grupo' grupo.id_grupo %}" class="btn-sm btn-danger" onclick="return confirm('⚠️ ¿Estás seguro de eliminar este grupo?')">
+                        <i class="fas fa-trash"></i>
+                        🗑️ Eliminar
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <span class="empty-emoji">👥</span>
+        <h3 class="empty-title">¡No hay grupos registrados!</h3>
+        <p class="empty-text">Comienza creando el primer grupo de tu iglesia</p>
+        <a href="{% url 'crear_grupo' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Crear Primer Grupo
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const groupCards = document.querySelectorAll('.group-card');
+    
+    groupCards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        if (searchData.includes(searchTerm)) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeIn 0.3s ease';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Add fade in animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

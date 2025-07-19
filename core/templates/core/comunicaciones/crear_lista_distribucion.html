@@ -1,0 +1,138 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Crear Lista de Distribución{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Crear Lista de Distribución</h1>
+                <a href="{% url 'listar_listas_distribucion' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger">{{ form.nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger">{{ form.descripcion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.incluir_solo_activos }}
+                                    <label class="form-check-label" for="{{ form.incluir_solo_activos.id_for_label }}">
+                                        {{ form.incluir_solo_activos.label }}
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.incluir_solo_con_email }}
+                                    <label class="form-check-label" for="{{ form.incluir_solo_con_email.id_for_label }}">
+                                        {{ form.incluir_solo_con_email.label }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.incluir_grupos.id_for_label }}">{{ form.incluir_grupos.label }}</label>
+                            <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background-color: #f8f9fa;">
+                                {% for choice in form.incluir_grupos %}
+                                    <div class="form-check mb-2">
+                                        {{ choice.tag }}
+                                        <label class="form-check-label ms-2" for="{{ choice.id_for_label }}">
+                                            <strong>{{ choice.choice_label }}</strong>
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.incluir_grupos.errors %}
+                                <div class="text-danger">{{ form.incluir_grupos.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Selecciona los grupos que deseas incluir en esta lista de distribución.</small>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            {{ form.activa }}
+                            <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                                {{ form.activa.label }}
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save"></i> Crear Lista
+                            </button>
+                            <a href="{% url 'listar_listas_distribucion' %}" class="btn btn-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-12">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">Filtros Automáticos:</h6>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <span><strong>Solo Activos:</strong> Incluye solo miembros con estado activo</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-envelope text-info me-2"></i>
+                            <span><strong>Solo con Email:</strong> Incluye solo miembros que tienen email</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-users text-primary me-2"></i>
+                            <span><strong>Grupos:</strong> Incluye miembros de los grupos seleccionados</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Nota:</strong> Los filtros se aplicarán automáticamente cada vez que uses esta lista.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

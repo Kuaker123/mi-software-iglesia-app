@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Enviar Mensaje{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-paper-plane"></i>
+                        Confirmar Envío de Mensaje
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Confirmación de Envío</h5>
+                        ¿Está seguro de que desea enviar este mensaje? Esta acción no se puede deshacer.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>{{ mensaje.asunto }}</h4>
+                            <div class="message-preview mt-3 p-3 border rounded">
+                                {{ mensaje.contenido|linebreaks }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Lista de Distribución</span>
+                                    <span class="info-box-number">{{ mensaje.lista_distribucion.nombre }}</span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Destinatarios</span>
+                                    <span class="info-box-number">{{ total_destinatarios }} personas</span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Prioridad</span>
+                                    <span class="info-box-number">
+                                        {% if mensaje.prioridad == 'alta' %}
+                                            <span class="badge badge-danger">Alta</span>
+                                        {% elif mensaje.prioridad == 'media' %}
+                                            <span class="badge badge-warning">Media</span>
+                                        {% else %}
+                                            <span class="badge badge-info">Baja</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Destinatarios ({{ total_destinatarios }})</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Teléfono</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for miembro in destinatarios %}
+                                            <tr>
+                                                <td>{{ miembro.nombre }} {{ miembro.apellido }}</td>
+                                                <td>{{ miembro.email }}</td>
+                                                <td>{{ miembro.telefono|default:"-" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Confirmar y Enviar
+                            </button>
+                            <a href="{% url 'detalle_mensaje' mensaje.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Configuración de Comunicación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-cogs"></i>
+                        Configuración de Comunicación
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.servidor_smtp.id_for_label }}">{{ form.servidor_smtp.label }}</label>
+                                    {{ form.servidor_smtp }}
+                                    {% if form.servidor_smtp.errors %}
+                                        <div class="text-danger">{{ form.servidor_smtp.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.puerto_smtp.id_for_label }}">{{ form.puerto_smtp.label }}</label>
+                                    {{ form.puerto_smtp }}
+                                    {% if form.puerto_smtp.errors %}
+                                        <div class="text-danger">{{ form.puerto_smtp.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.usuario_smtp.id_for_label }}">{{ form.usuario_smtp.label }}</label>
+                                    {{ form.usuario_smtp }}
+                                    {% if form.usuario_smtp.errors %}
+                                        <div class="text-danger">{{ form.usuario_smtp.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.password_smtp.id_for_label }}">{{ form.password_smtp.label }}</label>
+                                    {{ form.password_smtp }}
+                                    {% if form.password_smtp.errors %}
+                                        <div class="text-danger">{{ form.password_smtp.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.usar_tls }}
+                                    <label class="form-check-label" for="{{ form.usar_tls.id_for_label }}">
+                                        {{ form.usar_tls.label }}
+                                    </label>
+                                    {% if form.usar_tls.errors %}
+                                        <div class="text-danger">{{ form.usar_tls.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.notificaciones_activas }}
+                                    <label class="form-check-label" for="{{ form.notificaciones_activas.id_for_label }}">
+                                        {{ form.notificaciones_activas.label }}
+                                    </label>
+                                    {% if form.notificaciones_activas.errors %}
+                                        <div class="text-danger">{{ form.notificaciones_activas.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.email_remitente.id_for_label }}">{{ form.email_remitente.label }}</label>
+                                    {{ form.email_remitente }}
+                                    {% if form.email_remitente.errors %}
+                                        <div class="text-danger">{{ form.email_remitente.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.nombre_remitente.id_for_label }}">{{ form.nombre_remitente.label }}</label>
+                                    {{ form.nombre_remitente }}
+                                    {% if form.nombre_remitente.errors %}
+                                        <div class="text-danger">{{ form.nombre_remitente.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.max_intentos_envio.id_for_label }}">{{ form.max_intentos_envio.label }}</label>
+                                    {{ form.max_intentos_envio }}
+                                    {% if form.max_intentos_envio.errors %}
+                                        <div class="text-danger">{{ form.max_intentos_envio.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.intervalo_entre_envios.id_for_label }}">{{ form.intervalo_entre_envios.label }}</label>
+                                    {{ form.intervalo_entre_envios }}
+                                    {% if form.intervalo_entre_envios.errors %}
+                                        <div class="text-danger">{{ form.intervalo_entre_envios.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.max_destinatarios_por_lote.id_for_label }}">{{ form.max_destinatarios_por_lote.label }}</label>
+                                    {{ form.max_destinatarios_por_lote }}
+                                    {% if form.max_destinatarios_por_lote.errors %}
+                                        <div class="text-danger">{{ form.max_destinatarios_por_lote.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.habilitar_seguimiento_lectura }}
+                                    <label class="form-check-label" for="{{ form.habilitar_seguimiento_lectura.id_for_label }}">
+                                        {{ form.habilitar_seguimiento_lectura.label }}
+                                    </label>
+                                    {% if form.habilitar_seguimiento_lectura.errors %}
+                                        <div class="text-danger">{{ form.habilitar_seguimiento_lectura.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                            <a href="{% url 'dashboard_comunicaciones' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

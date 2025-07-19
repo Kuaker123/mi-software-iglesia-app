@@ -1,0 +1,505 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}👤 {% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Miembro - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_miembros' %}">👥 Miembros</a></li>
+    <li class="breadcrumb-item active">👤 {% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Miembro</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+    }
+    
+    .form-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .form-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .form-sections {
+        display: grid;
+        gap: 2rem;
+    }
+    
+    .form-section {
+        background: #f8fafc;
+        padding: 2rem;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-section:hover {
+        border-color: #667eea;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .form-group {
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .label-icon {
+        color: #667eea;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    
+    .invalid-feedback {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .form-check:hover {
+        border-color: #667eea;
+        background: #f8fafc;
+    }
+    
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        margin: 0;
+    }
+    
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        color: #374151;
+        margin: 0;
+        cursor: pointer;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e2e8f0;
+    }
+    
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .btn-secondary:hover {
+        background: #e2e8f0;
+        color: #475569;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+    
+    .form-help {
+        background: #f0f9ff;
+        border: 2px solid #bae6fd;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        color: #0369a1;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 1.5rem;
+        }
+        
+        .form-title {
+            font-size: 2rem;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1 class="form-title">
+            <span>👤</span>
+            {% if form.instance.pk %}
+                ✏️ Editar Miembro
+            {% else %}
+                ➕ Nuevo Miembro
+            {% endif %}
+        </h1>
+        <p class="form-subtitle">
+            {% if form.instance.pk %}
+                Actualiza la información del miembro
+            {% else %}
+                Completa la información para registrar un nuevo miembro
+            {% endif %}
+        </p>
+    </div>
+    
+    <form method="post" id="memberForm">
+        {% csrf_token %}
+        
+        <!-- Información Personal -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                👤 Información Personal
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group floating-label">
+                    {{ form.nombre|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.nombre.id_for_label }}">
+                        <i class="fas fa-user label-icon"></i>
+                        Nombre *
+                    </label>
+                    {% if form.nombre.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.nombre.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group floating-label">
+                    {{ form.apellido|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.apellido.id_for_label }}">
+                        <i class="fas fa-user label-icon"></i>
+                        Apellido *
+                    </label>
+                    {% if form.apellido.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.apellido.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group floating-label">
+                    {{ form.fecha_nacimiento|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.fecha_nacimiento.id_for_label }}">
+                        <i class="fas fa-birthday-cake label-icon"></i>
+                        🎂 Fecha de Nacimiento
+                    </label>
+                    {% if form.fecha_nacimiento.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.fecha_nacimiento.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group floating-label">
+                    {{ form.genero|add_class:"form-control" }}
+                    <label for="{{ form.genero.id_for_label }}">
+                        <i class="fas fa-venus-mars label-icon"></i>
+                        ⚧️ Género
+                    </label>
+                    {% if form.genero.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.genero.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de Contacto -->
+        <div class="form-section">
+            <h3 class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-address-book"></i>
+                </div>
+                📞 Información de Contacto
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group floating-label">
+                    {{ form.email|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.email.id_for_label }}">
+                        <i class="fas fa-envelope label-icon"></i>
+                        📧 Email
+                    </label>
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.email.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group floating-label">
+                    {{ form.telefono|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.telefono.id_for_label }}">
+                        <i class="fas fa-phone label-icon"></i>
+                        📱 Teléfono
+                    </label>
+                    {% if form.telefono.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.telefono.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group floating-label" style="grid-column: 1 / -1;">
+                    {{ form.direccion|add_class:"form-control"|attr:"placeholder: " }}
+                    <label for="{{ form.direccion.id_for_label }}">
+                        <i class="fas fa-map-marker-alt label-icon"></i>
+                        🏠 Dirección
+                    </label>
+                    {% if form.direccion.errors %}
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.direccion.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de Membresía -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon">🏠</div>
+                <span>Información de Membresía</span>
+            </div>
+            
+            <!-- Fecha de ingreso - mostrar siempre -->
+            <div class="form-group">
+                <label class="form-label" for="{{ form.fecha_ingreso_manual.id_for_label }}">
+                    <i class="fas fa-calendar"></i> {{ form.fecha_ingreso_manual.label }}
+                </label>
+                {{ form.fecha_ingreso_manual }}
+                {% if form.fecha_ingreso_manual.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.fecha_ingreso_manual.errors.0 }}
+                    </div>
+                {% endif %}
+                {% if form.fecha_ingreso_manual.help_text %}
+                    <small class="form-text text-muted">{{ form.fecha_ingreso_manual.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Checkbox Miembro Activo -->
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.activo }}
+                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                        <i class="fas fa-check-circle"></i> {{ form.activo.label }}
+                    </label>
+                </div>
+                {% if form.activo.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.activo.errors.0 }}
+                    </div>
+                {% endif %}
+                {% if form.activo.help_text %}
+                    <small class="form-text text-muted">{{ form.activo.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="info-note">
+                <i class="fas fa-info-circle"></i>
+                <span>Los campos marcados con (*) son obligatorios. La fecha de ingreso se usa para calcular la antigüedad del miembro.</span>
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                {% if form.instance.pk %}
+                    💾 Actualizar Miembro
+                {% else %}
+                    ➕ Crear Miembro
+                {% endif %}
+            </button>
+            
+            <a href="{% url 'listar_miembros' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Set today's date as default for ingreso date
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaIngreso = document.getElementById('{{ form.fecha_ingreso.id_for_label }}');
+        if (fechaIngreso && !fechaIngreso.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaIngreso.value = today;
+        }
+
+        // Auto-focus first field
+        const firstInput = document.querySelector('.form-control');
+        if (firstInput) {
+            firstInput.focus();
+        }
+    });
+</script>
+{% endblock %}

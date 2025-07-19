@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Eventos - Sistema Iglesia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        .calendar-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        .calendar-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .calendar-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .current-month {
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .view-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .view-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn.active {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .calendar-body {
+            padding: 2rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-header-cell {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .calendar-cell {
+            background: white;
+            min-height: 120px;
+            padding: 0.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-cell:hover {
+            background: var(--light-bg);
+        }
+        
+        .calendar-cell.other-month {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .calendar-cell.today {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .cell-date {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cell-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .event-item {
+            background: var(--secondary-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .event-item:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .event-item.event-past {
+            background: #6c757d;
+        }
+        
+        .event-item.event-today {
+            background: var(--warning-color);
+        }
+        
+        .event-item.event-private {
+            background: var(--accent-color);
+        }
+        
+        .events-sidebar {
+            background: var(--light-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+        
+        .sidebar-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .upcoming-events {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .upcoming-event {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .upcoming-event:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .upcoming-event h6 {
+            margin: 0 0 0.5rem 0;
+            color: var(--dark-text);
+            font-weight: 600;
+        }
+        
+        .upcoming-event small {
+            color: #6c757d;
+            display: block;
+        }
+        
+        .legend {
+            margin-top: 2rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-custom {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            color: white;
+        }
+        
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-body {
+                padding: 1rem;
+            }
+            
+            .calendar-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .calendar-cell {
+                min-height: 80px;
+                padding: 0.25rem;
+            }
+            
+            .event-item {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid main-container">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="calendar-card">
+                    <div class="calendar-header">
+                        <h1><i class="fas fa-calendar-alt"></i> Calendario de Eventos</h1>
+                        <div class="calendar-controls">
+                            <div class="month-navigation">
+                                <button class="nav-btn" onclick="previousMonth()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="current-month" id="currentMonth">
+                                    {{ mes_actual|date:'F Y' }}
+                                </div>
+                                <button class="nav-btn" onclick="nextMonth()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="view-controls">
+                                <button class="view-btn active" onclick="setView('month')">
+                                    <i class="fas fa-calendar"></i> Mes
+                                </button>
+                                <button class="view-btn" onclick="setView('week')">
+                                    <i class="fas fa-calendar-week"></i> Semana
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-body">
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Encabezados de días -->
+                            <div class="calendar-header-cell">Dom</div>
+                            <div class="calendar-header-cell">Lun</div>
+                            <div class="calendar-header-cell">Mar</div>
+                            <div class="calendar-header-cell">Mié</div>
+                            <div class="calendar-header-cell">Jue</div>
+                            <div class="calendar-header-cell">Vie</div>
+                            <div class="calendar-header-cell">Sáb</div>
+                            
+                            <!-- Celdas del calendario se generarán dinámicamente -->
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{% url 'crear_evento' %}" class="btn-custom btn-success-custom">
+                                <i class="fas fa-plus"></i>
+                                Crear Nuevo Evento
+                            </a>
+                            <a href="{% url 'listar_eventos' %}" class="btn-custom btn-primary-custom">
+                                <i class="fas fa-list"></i>
+                                Ver Lista de Eventos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3">
+                <div class="events-sidebar">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-clock"></i>
+                        Próximos Eventos
+                    </h3>
+                    
+                    <div class="upcoming-events">
+                        {% for evento in proximos_eventos %}
+                        <div class="upcoming-event" onclick="window.location.href='{% url 'detalle_evento' evento.id_evento %}'">
+                            <h6>{{ evento.nombre_evento }}</h6>
+                            <small>
+                                <i class="fas fa-calendar"></i> {{ evento.fecha_evento|date:'d/m/Y H:i' }}
+                            </small>
+                            {% if evento.ubicacion %}
+                            <small>
+                                <i class="fas fa-map-marker-alt"></i> {{ evento.ubicacion }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No hay eventos próximos</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="legend">
+                        <h5 class="sidebar-title">
+                            <i class="fas fa-info-circle"></i>
+                            Leyenda
+                        </h5>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--secondary-color);"></div>
+                            <span>Eventos futuros</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--warning-color);"></div>
+                            <span>Eventos de hoy</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #6c757d;"></div>
+                            <span>Eventos pasados</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-color);"></div>
+                            <span>Eventos privados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Datos de eventos (normalmente vendrían del backend)
+        const eventos = {{ eventos_json|safe }};
+        let currentDate = new Date();
+        let currentView = 'month';
+        
+        function generateCalendar(year, month) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            // Limpiar celdas existentes (mantener encabezados)
+            const cells = calendarGrid.querySelectorAll('.calendar-cell');
+            cells.forEach(cell => cell.remove());
+            
+            // Generar 42 celdas (6 semanas)
+            for (let i = 0; i < 42; i++) {
+                const cellDate = new Date(startDate);
+                cellDate.setDate(startDate.getDate() + i);
+                
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell';
+                
+                // Marcar celdas de otros meses
+                if (cellDate.getMonth() !== month) {
+                    cell.classList.add('other-month');
+                }
+                
+                // Marcar el día de hoy
+                const today = new Date();
+                if (cellDate.toDateString() === today.toDateString()) {
+                    cell.classList.add('today');
+                }
+                
+                // Número del día
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'cell-date';
+                dateDiv.textContent = cellDate.getDate();
+                cell.appendChild(dateDiv);
+                
+                // Eventos del día
+                const eventsDiv = document.createElement('div');
+                eventsDiv.className = 'cell-events';
+                
+                const dayEvents = eventos.filter(evento => {
+                    const eventoDate = new Date(evento.fecha_evento);
+                    return eventoDate.toDateString() === cellDate.toDateString();
+                });
+                
+                dayEvents.forEach(evento => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'event-item';
+                    eventDiv.textContent = evento.nombre_evento;
+                    eventDiv.title = `${evento.nombre_evento} - ${evento.fecha_evento}`;
+                    
+                    // Clasificar eventos
+                    const eventoDate = new Date(evento.fecha_evento);
+                    if (eventoDate.toDateString() === today.toDateString()) {
+                        eventDiv.classList.add('event-today');
+                    } else if (eventoDate < today) {
+                        eventDiv.classList.add('event-past');
+                    }
+                    
+                    if (!evento.publico) {
+                        eventDiv.classList.add('event-private');
+                    }
+                    
+                    eventDiv.onclick = () => {
+                        window.location.href = `/core/eventos/${evento.id_evento}/`;
+                    };
+                    
+                    eventsDiv.appendChild(eventDiv);
+                });
+                
+                cell.appendChild(eventsDiv);
+                calendarGrid.appendChild(cell);
+            }
+        }
+        
+        function updateMonthDisplay() {
+            const monthNames = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            
+            document.getElementById('currentMonth').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        }
+        
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            updateMonthDisplay();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            updateMonthDisplay();
+        }
+        
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Aquí se implementaría la lógica para cambiar la vista
+            if (view === 'week') {
+                // Implementar vista semanal
+                alert('Vista semanal en desarrollo');
+            }
+        }
+        
+        // Inicializar calendario
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+            updateMonthDisplay();
+        });
+        
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                previousMonth();
+            } else if (e.key === 'ArrowRight') {
+                nextMonth();
+            }
+        });
+    </script>
+</body>
+</html>

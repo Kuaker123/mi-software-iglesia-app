@@ -1,0 +1,208 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Crear Certificado - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+    <a href="{% url 'listar_certificados' %}">Certificados</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Crear Certificado</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .preview-section {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        min-height: 400px;
+        border-radius: 8px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2"><i class="fas fa-plus-circle"></i> Crear Nuevo Certificado</h1>
+    <a href="{% url 'listar_certificados' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver a la Lista
+    </a>
+</div>
+
+<div class="row">
+    <!-- Formulario -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Información del Certificado</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="certificadoForm">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.tipo_certificado.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag"></i> Tipo de Certificado *
+                            </label>
+                            {{ form.tipo_certificado }}
+                            {% if form.tipo_certificado.errors %}
+                                <div class="text-danger small">{{ form.tipo_certificado.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.miembro.id_for_label }}" class="form-label">
+                                <i class="fas fa-user"></i> Miembro *
+                            </label>
+                            {{ form.miembro }}
+                            {% if form.miembro.errors %}
+                                <div class="text-danger small">{{ form.miembro.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.fecha_evento_certificado.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar"></i> Fecha del Evento
+                            </label>
+                            {{ form.fecha_evento_certificado }}
+                            {% if form.fecha_evento_certificado.errors %}
+                                <div class="text-danger small">{{ form.fecha_evento_certificado.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.id_evento.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar-check"></i> Evento Relacionado
+                            </label>
+                            {{ form.id_evento }}
+                            {% if form.id_evento.errors %}
+                                <div class="text-danger small">{{ form.id_evento.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.contenido_personalizado.id_for_label }}" class="form-label">
+                            <i class="fas fa-file-alt"></i> Contenido Personalizado
+                        </label>
+                        {{ form.contenido_personalizado }}
+                        {% if form.contenido_personalizado.errors %}
+                            <div class="text-danger small">{{ form.contenido_personalizado.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Puede usar variables como {nombre}, {apellido}, {fecha}, etc.</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.pastor_nombre.id_for_label }}" class="form-label">
+                                <i class="fas fa-user-tie"></i> Pastor
+                            </label>
+                            {{ form.pastor_nombre }}
+                            {% if form.pastor_nombre.errors %}
+                                <div class="text-danger small">{{ form.pastor_nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.testigo1_nombre.id_for_label }}" class="form-label">
+                                <i class="fas fa-user-check"></i> Testigo 1
+                            </label>
+                            {{ form.testigo1_nombre }}
+                            {% if form.testigo1_nombre.errors %}
+                                <div class="text-danger small">{{ form.testigo1_nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.testigo2_nombre.id_for_label }}" class="form-label">
+                                <i class="fas fa-user-check"></i> Testigo 2
+                            </label>
+                            {{ form.testigo2_nombre }}
+                            {% if form.testigo2_nombre.errors %}
+                                <div class="text-danger small">{{ form.testigo2_nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small">{{ form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.estado.id_for_label }}" class="form-label">
+                            <i class="fas fa-flag"></i> Estado
+                        </label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                            <div class="text-danger small">{{ form.estado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'listar_certificados' %}" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" name="action" value="guardar" class="btn btn-outline-primary me-md-2">
+                            <i class="fas fa-save"></i> Guardar como Borrador
+                        </button>
+                        <button type="submit" name="action" value="emitir" class="btn btn-primary">
+                            <i class="fas fa-certificate"></i> Guardar y Emitir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista Previa -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-eye"></i> Vista Previa</h5>
+            </div>
+            <div class="card-body">
+                <div class="preview-section d-flex align-items-center justify-content-center">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-file-alt fa-3x mb-3"></i>
+                        <p>Seleccione un tipo de certificado para ver la vista previa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Tipo -->
+        <div class="card mt-3" id="tipoInfo" style="display: none;">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información del Tipo</h6>
+            </div>
+            <div class="card-body">
+                <div id="tipoDescripcion"></div>
+                <div id="tipoCampos"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Script para vista previa dinámica
+    document.getElementById('id_tipo_certificado').addEventListener('change', function() {
+        const tipoId = this.value;
+        if (tipoId) {
+            // Aquí se puede agregar AJAX para cargar la vista previa
+            document.getElementById('tipoInfo').style.display = 'block';
+        } else {
+            document.getElementById('tipoInfo').style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

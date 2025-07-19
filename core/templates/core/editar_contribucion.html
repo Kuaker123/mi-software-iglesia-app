@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Contribución - Sistema Iglesia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .form-container {
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1rem;
+            transition: transform 0.2s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✏️ Editar Contribución</h1>
+            <p>Modifica los datos de la contribución</p>
+        </div>
+        
+        <div class="form-container">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.id_miembro.id_for_label }}">👤 Miembro:</label>
+                        {{ form.id_miembro }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.cantidad.id_for_label }}">💰 Cantidad:</label>
+                        {{ form.cantidad }}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.tipo_contribucion.id_for_label }}">📋 Tipo:</label>
+                        {{ form.tipo_contribucion }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.fecha_contribucion.id_for_label }}">📅 Fecha:</label>
+                        {{ form.fecha_contribucion }}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.categoria.id_for_label }}">🏷️ Categoría:</label>
+                        {{ form.categoria }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.metodo_pago.id_for_label }}">💳 Método de Pago:</label>
+                        {{ form.metodo_pago }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.concepto.id_for_label }}">📝 Concepto:</label>
+                    {{ form.concepto }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.descripcion.id_for_label }}">📄 Descripción:</label>
+                    {{ form.descripcion }}
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn">💾 Guardar Cambios</button>
+                    <a href="{% url 'listar_contribuciones' %}" class="btn btn-secondary">❌ Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

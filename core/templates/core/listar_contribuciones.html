@@ -1,0 +1,612 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}💰 Contribuciones - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">💰 Contribuciones</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '💰';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        font-size: 8rem;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #059669, #34d399);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+    
+    .stat-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .action-bar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .filters-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .filter-select {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        background: #f8fafc;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: #10b981;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .contributions-table {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .table {
+        margin: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: #f8fafc;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .table tbody tr:hover {
+        background: #f8fafc;
+        transform: scale(1.01);
+    }
+    
+    .table tbody td {
+        padding: 1.25rem 1.5rem;
+        border: none;
+        vertical-align: middle;
+    }
+    
+    .contribution-amount {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #10b981;
+    }
+    
+    .contribution-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .type-diezmo {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+    
+    .type-ofrenda {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+    
+    .type-especial {
+        background: rgba(168, 85, 247, 0.1);
+        color: #a855f7;
+    }
+    
+    .member-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .member-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .member-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    
+    .member-email {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+    }
+    
+    .date-info {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .actions-cell {
+        text-align: center;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        margin: 0 0.25rem;
+    }
+    
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-warning {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background: #d97706;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #dc2626;
+        color: white;
+        text-decoration: none;
+        transform: scale(1.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+    
+    .empty-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+        opacity: 0.7;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #334155;
+    }
+    
+    .empty-text {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        
+        .action-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filters-container {
+            justify-content: center;
+        }
+        
+        .table-responsive {
+            border-radius: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="page-emoji">💰</span>
+        Gestión de Contribuciones
+    </h1>
+    <p class="page-subtitle">Administra y controla todas las contribuciones de tu iglesia</p>
+</div>
+
+<!-- Statistics Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <span class="stat-emoji">💵</span>
+        <span class="stat-number">${{ total_contribuciones|floatformat:2 }}</span>
+        <div class="stat-label">Total Recaudado</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">📊</span>
+        <span class="stat-number">{{ cantidad_contribuciones }}</span>
+        <div class="stat-label">Contribuciones</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">📅</span>
+        <span class="stat-number">${{ mes_actual|floatformat:2 }}</span>
+        <div class="stat-label">Este Mes</div>
+    </div>
+    
+    <div class="stat-card">
+        <span class="stat-emoji">📈</span>
+        <span class="stat-number">${{ promedio_mensual|floatformat:2 }}</span>
+        <div class="stat-label">Promedio Mensual</div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="filters-container">
+        <select class="filter-select" id="tipoFilter">
+            <option value="">🏷️ Todos los tipos</option>
+            <option value="diezmo">💰 Diezmos</option>
+            <option value="ofrenda">🎁 Ofrendas</option>
+            <option value="especial">⭐ Especiales</option>
+        </select>
+        
+        <select class="filter-select" id="mesFilter">
+            <option value="">📅 Todos los meses</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+        </select>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <a href="{% url 'crear_contribucion' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Nueva Contribución
+        </a>
+    </div>
+</div>
+
+<!-- Contributions Table -->
+{% if contribuciones %}
+    <div class="contributions-table">
+        <div class="table-header">
+            <h3 class="table-title">
+                📋 Lista de Contribuciones
+            </h3>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>👤 Miembro</th>
+                        <th>💰 Cantidad</th>
+                        <th>🏷️ Tipo</th>
+                        <th>📅 Fecha</th>
+                        <th>💳 Método</th>
+                        <th>⚙️ Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contribucion in contribuciones %}
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">
+                                        {{ contribucion.id_miembro.nombre|first }}{{ contribucion.id_miembro.apellido|first }}
+                                    </div>
+                                    <div class="member-details">
+                                        <div class="member-name">{{ contribucion.id_miembro.nombre }} {{ contribucion.id_miembro.apellido }}</div>
+                                        <div class="member-email">{{ contribucion.id_miembro.email|default:"Sin email" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="contribution-amount">${{ contribucion.cantidad|floatformat:2 }}</span>
+                            </td>
+                            <td>
+                                <span class="contribution-type type-{{ contribucion.tipo_contribucion|lower }}">
+                                    {% if contribucion.tipo_contribucion == 'Diezmo' %}
+                                        💰 {{ contribucion.tipo_contribucion }}
+                                    {% elif contribucion.tipo_contribucion == 'Ofrenda' %}
+                                        🎁 {{ contribucion.tipo_contribucion }}
+                                    {% else %}
+                                        ⭐ {{ contribucion.tipo_contribucion }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="date-info">
+                                    📅 {{ contribucion.fecha_contribucion|date:"d/m/Y" }}
+                                </div>
+                            </td>
+                            <td>
+                                <span>💳 {{ contribucion.metodo_pago|default:"Efectivo" }}</span>
+                            </td>
+                            <td class="actions-cell">
+                                <a href="{% url 'detalle_contribucion' contribucion.id_contribucion %}" class="btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                    👁️
+                                </a>
+                                <a href="{% url 'editar_contribucion' contribucion.id_contribucion %}" class="btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                    ✏️
+                                </a>
+                                <a href="{% url 'eliminar_contribucion' contribucion.id_contribucion %}" class="btn-sm btn-danger" onclick="return confirm('⚠️ ¿Estás seguro de eliminar esta contribución?')">
+                                    <i class="fas fa-trash"></i>
+                                    🗑️
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <span class="empty-emoji">💰</span>
+        <h3 class="empty-title">¡No hay contribuciones registradas!</h3>
+        <p class="empty-text">Comienza registrando la primera contribución</p>
+        <a href="{% url 'crear_contribucion' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            ➕ Registrar Primera Contribución
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filter functionality
+document.getElementById('tipoFilter').addEventListener('change', function() {
+    filterTable();
+});
+
+document.getElementById('mesFilter').addEventListener('change', function() {
+    filterTable();
+});
+
+function filterTable() {
+    const tipoFilter = document.getElementById('tipoFilter').value.toLowerCase();
+    const mesFilter = document.getElementById('mesFilter').value;
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        let showRow = true;
+        
+        // Filter by type
+        if (tipoFilter) {
+            const typeCell = row.querySelector('.contribution-type');
+            if (typeCell && !typeCell.textContent.toLowerCase().includes(tipoFilter)) {
+                showRow = false;
+            }
+        }
+        
+        // Filter by month
+        if (mesFilter && showRow) {
+            const dateCell = row.querySelector('.date-info');
+            if (dateCell) {
+                const dateText = dateCell.textContent;
+                const month = dateText.split('/')[1]; // Extract month from dd/mm/yyyy
+                if (month !== mesFilter.padStart(2, '0')) {
+                    showRow = false;
+                }
+            }
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

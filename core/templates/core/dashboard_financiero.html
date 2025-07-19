@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financiero - Sistema Iglesia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .nav {
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+            text-align: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .list-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f3f4;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .list-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .category-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .category-amount {
+            font-weight: bold;
+            color: #667eea;
+        }
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💰 Dashboard Financiero Avanzado</h1>
+        <p>Análisis completo de las finanzas de la iglesia</p>
+    </div>
+    
+    <div class="nav">
+        <div class="nav-container">
+            <a href="{% url 'dashboard' %}">🏠 Dashboard Principal</a>
+            <a href="{% url 'listar_contribuciones' %}">📋 Contribuciones</a>
+            <a href="{% url 'reportes_financieros' %}">📊 Reportes</a>
+            <a href="{% url 'crear_contribucion' %}">➕ Nueva Contribución</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Estadísticas Generales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number">${{ totales_generales.total_ingresos|floatformat:0 }}</div>
+                <div class="stat-label">Total Ingresos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💸</div>
+                <div class="stat-number">${{ totales_generales.total_egresos|floatformat:0 }}</div>
+                <div class="stat-label">Total Egresos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-number">${{ totales_generales.balance|floatformat:0 }}</div>
+                <div class="stat-label">Balance General</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number">{{ totales_generales.total_movimientos }}</div>
+                <div class="stat-label">Total Movimientos</div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">📈 Ingresos vs Egresos Mensual</div>
+                <canvas id="chartIngresosMensuales" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">🥧 Distribución por Categorías</div>
+                <canvas id="chartCategorias" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="content-grid">
+            <!-- Movimientos Recientes -->
+            <div class="section">
+                <h3 class="section-title">
+                    <span>📋</span>
+                    Movimientos Recientes
+                </h3>
+                {% for movimiento in movimientos_recientes %}
+                    <div class="list-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${{ movimiento.cantidad|floatformat:0 }}</strong> - {{ movimiento.tipo_contribucion }}<br>
+                                <small>👤 {{ movimiento.id_miembro.nombre }} - 📅 {{ movimiento.fecha_contribucion|date:"d/m/Y" }}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="category-amount">{{ movimiento.categoria }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        📭 No hay movimientos recientes
+                    </div>
+                {% endfor %}
+                <a href="{% url 'listar_contribuciones' %}" class="btn">👁️ Ver Todos</a>
+            </div>
+
+            <!-- Panel Lateral -->
+            <div>
+                <!-- Alertas Financieras -->
+                <div class="section" style="margin-bottom: 2rem;">
+                    <h3 class="section-title">
+                        <span>⚠️</span>
+                        Alertas Financieras
+                    </h3>
+                    {% for alerta in alertas_financieras %}
+                        <div class="alert alert-{{ alerta.tipo }}">
+                            <strong>{{ alerta.titulo }}</strong><br>
+                            {{ alerta.mensaje }}
+                        </div>
+                    {% empty %}
+                        <div class="alert alert-info">
+                            <strong>✅ Todo en orden</strong><br>
+                            No hay alertas financieras pendientes.
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Análisis por Categorías -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <span>🏷️</span>
+                        Análisis por Categorías
+                    </h3>
+                    
+                    <h4 style="color: #28a745; margin-bottom: 1rem;">💰 Ingresos</h4>
+                    {% for categoria in categorias_ingresos %}
+                        <div class="category-item">
+                            <span class="category-name">{{ categoria.tipo_contribucion }}</span>
+                            <span class="category-amount">${{ categoria.total|floatformat:0 }}</span>
+                        </div>
+                    {% endfor %}
+                    
+                    <h4 style="color: #dc3545; margin: 1.5rem 0 1rem 0;">💸 Egresos</h4>
+                    {% for categoria in categorias_egresos %}
+                        <div class="category-item">
+                            <span class="category-name">{{ categoria.tipo_contribucion }}</span>
+                            <span class="category-amount">${{ categoria.total|floatformat:0 }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="section">
+            <h3 class="section-title">
+                <span>🚀</span>
+                Acciones Rápidas
+            </h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                <a href="{% url 'crear_contribucion' %}" class="btn">➕ Nueva Contribución</a>
+                <a href="{% url 'reportes_financieros' %}" class="btn">📊 Generar Reporte</a>
+                <a href="{% url 'exportar_finanzas' 'pdf' %}" class="btn">📄 Exportar PDF</a>
+                <a href="{% url 'exportar_finanzas' 'csv' %}" class="btn">📊 Exportar CSV</a>
+                <a href="{% url 'importar_contribuciones' %}" class="btn">📂 Importar Datos</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos para gráficos desde Django
+        const datosGraficos = {{ datos_graficos|safe }};
+        
+        // Gráfico de Ingresos Mensuales
+        const ctxIngresos = document.getElementById('chartIngresosMensuales').getContext('2d');
+        new Chart(ctxIngresos, {
+            type: 'line',
+            data: {
+                labels: datosGraficos.meses,
+                datasets: [{
+                    label: 'Ingresos',
+                    data: datosGraficos.ingresos_mensuales,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Egresos',
+                    data: datosGraficos.egresos_mensuales,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de Categorías
+        const ctxCategorias = document.getElementById('chartCategorias').getContext('2d');
+        new Chart(ctxCategorias, {
+            type: 'doughnut',
+            data: {
+                labels: datosGraficos.categorias_labels,
+                datasets: [{
+                    data: datosGraficos.categorias_data,
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#f5576c',
+                        '#4facfe',
+                        '#00f2fe',
+                        '#43e97b',
+                        '#38f9d7'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

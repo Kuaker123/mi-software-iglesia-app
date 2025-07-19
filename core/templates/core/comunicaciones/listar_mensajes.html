@@ -1,0 +1,192 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Mensajes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Mensajes</h1>
+                <a href="{% url 'crear_mensaje' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Mensaje
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-3">
+                            <input type="text" name="busqueda" class="form-control" 
+                                   placeholder="Buscar mensajes..." 
+                                   value="{{ request.GET.busqueda }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="estado" class="form-control">
+                                <option value="">Todos los estados</option>
+                                <option value="borrador" {% if request.GET.estado == 'borrador' %}selected{% endif %}>Borrador</option>
+                                <option value="programado" {% if request.GET.estado == 'programado' %}selected{% endif %}>Programado</option>
+                                <option value="enviado" {% if request.GET.estado == 'enviado' %}selected{% endif %}>Enviado</option>
+                                <option value="error" {% if request.GET.estado == 'error' %}selected{% endif %}>Error</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="tipo" class="form-control">
+                                <option value="">Todos los tipos</option>
+                                <option value="email" {% if request.GET.tipo == 'email' %}selected{% endif %}>Email</option>
+                                <option value="notificacion" {% if request.GET.tipo == 'notificacion' %}selected{% endif %}>Notificación</option>
+                                <option value="anuncio" {% if request.GET.tipo == 'anuncio' %}selected{% endif %}>Anuncio</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="fecha_desde" class="form-control" 
+                                   value="{{ request.GET.fecha_desde }}" placeholder="Desde">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="fecha_hasta" class="form-control" 
+                                   value="{{ request.GET.fecha_hasta }}" placeholder="Hasta">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Mensajes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if mensajes %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Destinatarios</th>
+                                    <th>Fecha Creación</th>
+                                    <th>Fecha Envío</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mensaje in mensajes %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ mensaje.titulo }}</strong>
+                                        {% if mensaje.asunto_email %}
+                                            <br><small class="text-muted">{{ mensaje.asunto_email|truncatechars:40 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">{{ mensaje.get_tipo_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{% if mensaje.estado == 'enviado' %}success{% elif mensaje.estado == 'error' %}danger{% elif mensaje.estado == 'programado' %}warning{% else %}secondary{% endif %}">
+                                            {{ mensaje.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-outline-primary">{{ mensaje.total_destinatarios }}</span>
+                                        {% if mensaje.total_enviados > 0 %}
+                                            <br><small class="text-success">{{ mensaje.total_enviados }} enviados</small>
+                                        {% endif %}
+                                        {% if mensaje.total_errores > 0 %}
+                                            <br><small class="text-danger">{{ mensaje.total_errores }} errores</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if mensaje.fecha_envio %}
+                                            {{ mensaje.fecha_envio|date:"d/m/Y H:i" }}
+                                        {% elif mensaje.fecha_programada %}
+                                            <small class="text-warning">Programado: {{ mensaje.fecha_programada|date:"d/m/Y H:i" }}</small>
+                                        {% else %}
+                                            <small class="text-muted">No enviado</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'detalle_mensaje' mensaje.id_mensaje %}" 
+                                               class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if mensaje.estado == 'borrador' %}
+                                                <a href="{% url 'enviar_mensaje' mensaje.id_mensaje %}" 
+                                                   class="btn btn-sm btn-outline-success" title="Enviar">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if mensajes.has_other_pages %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if mensajes.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ mensajes.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        Anterior
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in mensajes.paginator.page_range %}
+                                {% if mensajes.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                            {{ num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if mensajes.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ mensajes.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        Siguiente
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay mensajes</h5>
+                        <p class="text-muted">Crea tu primer mensaje para comenzar a comunicarte con los miembros.</p>
+                        <a href="{% url 'crear_mensaje' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primer Mensaje
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

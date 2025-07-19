@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar {{ miembro.nombre }} {{ miembro.apellido }} - Sistema Iglesia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .nav-breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-breadcrumb a:hover {
+            color: #764ba2;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Form Labels */
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        /* Form Inputs */
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ed8936;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.1);
+        }
+
+        .form-input:valid {
+            border-color: #48bb78;
+        }
+
+        .form-input:invalid:not(:placeholder-shown) {
+            border-color: #e53e3e;
+        }
+
+        /* Textarea */
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Select */
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+
+        /* Input Icons */
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            font-size: 1.1rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .with-icon {
+            padding-left: 50px;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            align-items: center;
+            padding-top: 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background: #feebc8;
+            color: #7b341e;
+            border-left: 4px solid #ed8936;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <nav class="nav-breadcrumb">
+                <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
+                <span>›</span>
+                <a href="{% url 'listar_miembros' %}">👥 Miembros</a>
+                <span>›</span>
+                <a href="{% url 'detalle_miembro' miembro.id_miembro %}">👤 {{ miembro.nombre }} {{ miembro.apellido }}</a>
+                <span>›</span>
+                <span>✏️ Editar</span>
+            </nav>
+            
+            <h1>
+                ✏️ Editar Miembro
+            </h1>
+            <p class="header-subtitle">
+                Modifica la información de {{ miembro.nombre }} {{ miembro.apellido }}
+            </p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-warning">
+            ⚠️ <strong>Importante:</strong> Los cambios se guardarán inmediatamente al enviar el formulario.
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form method="post" id="editMemberForm">
+                {% csrf_token %}
+                
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        👤 Información Personal
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                👤 Nombre <span class="required">*</span>
+                            </label>
+                            <div class="input-icon">👤</div>
+                            <input type="text" name="{{ form.nombre.name }}" id="{{ form.nombre.id_for_label }}" class="form-input with-icon" value="{{ form.nombre.value|default:'' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.apellido.id_for_label }}" class="form-label">
+                                👤 Apellido <span class="required">*</span>
+                            </label>
+                            <div class="input-icon">👤</div>
+                            <input type="text" name="{{ form.apellido.name }}" id="{{ form.apellido.id_for_label }}" class="form-input with-icon" value="{{ form.apellido.value|default:'' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">
+                                📅 Fecha de Nacimiento
+                            </label>
+                            <input type="date" name="{{ form.fecha_nacimiento.name }}" id="{{ form.fecha_nacimiento.id_for_label }}" class="form-input" value="{{ form.fecha_nacimiento.value|date:'Y-m-d'|default:'' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.genero.id_for_label }}" class="form-label">
+                                ⚧️ Género
+                            </label>
+                            <select name="{{ form.genero.name }}" id="{{ form.genero.id_for_label }}" class="form-input form-select">
+                                <option value="">Seleccionar género</option>
+                                <option value="M" {% if form.genero.value == 'M' %}selected{% endif %}>Masculino</option>
+                                <option value="F" {% if form.genero.value == 'F' %}selected{% endif %}>Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        📞 Información de Contacto
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                📧 Email
+                            </label>
+                            <div class="input-icon">📧</div>
+                            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" class="form-input with-icon" value="{{ form.email.value|default:'' }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                                📱 Teléfono
+                            </label>
+                            <div class="input-icon">📱</div>
+                            <input type="tel" name="{{ form.telefono.name }}" id="{{ form.telefono.id_for_label }}" class="form-input with-icon" value="{{ form.telefono.value|default:'' }}">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="{{ form.direccion.id_for_label }}" class="form-label">
+                                📍 Dirección
+                            </label>
+                            <div class="input-icon">📍</div>
+                            <textarea name="{{ form.direccion.name }}" id="{{ form.direccion.id_for_label }}" class="form-input form-textarea with-icon" rows="3">{{ form.direccion.value|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Church Information Section -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        ⛪ Información de la Iglesia
+                    </h2>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="{{ form.fecha_ingreso_manual.id_for_label }}" class="form-label">
+                                📅 Fecha de Ingreso <span class="required">*</span>
+                            </label>
+                            <input type="date" name="{{ form.fecha_ingreso_manual.name }}" id="{{ form.fecha_ingreso_manual.id_for_label }}" class="form-input" value="{{ miembro.fecha_ingreso|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                ✅ Estado del Miembro
+                            </label>
+                            <select name="{{ form.estado.name }}" id="{{ form.estado.id_for_label }}" class="form-input form-select">
+                                <option value="">Seleccionar estado</option>
+                                <option value="Activo" {% if form.estado.value == 'Activo' %}selected{% endif %}>Activo</option>
+                                <option value="Inactivo" {% if form.estado.value == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+                                <option value="Pendiente" {% if form.estado.value == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{% url 'detalle_miembro' miembro.id_miembro %}" class="btn btn-secondary">
+                        ❌ Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        💾 Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus first field
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstInput = document.querySelector('.form-input');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

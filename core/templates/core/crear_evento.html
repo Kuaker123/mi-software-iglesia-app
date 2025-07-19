@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Evento - Sistema Iglesia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .form-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        
+        .form-header .subtitle {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        .form-body {
+            padding: 2.5rem;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-bg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            color: var(--dark-text);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .form-check {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 10px;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .btn-group-custom {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-custom {
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        .preview-section {
+            background: var(--light-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .preview-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preview-content {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .required-field::after {
+            content: ' *';
+            color: var(--accent-color);
+        }
+        
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 1.5rem;
+            }
+            
+            .btn-group-custom {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h1><i class="fas fa-calendar-plus"></i> Crear Nuevo Evento</h1>
+                        <p class="subtitle">Registra un nuevo evento para la comunidad</p>
+                    </div>
+                    
+                    <div class="form-body">
+                        <form method="post" id="eventoForm">
+                            {% csrf_token %}
+                            
+                            <!-- Información Básica -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-info-circle"></i>
+                                    Información Básica
+                                </h3>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.nombre_evento.id_for_label }}" class="form-label required-field">
+                                        <i class="fas fa-tag"></i>
+                                        {{ form.nombre_evento.label }}
+                                    </label>
+                                    {{ form.nombre_evento }}
+                                    <div class="help-text">Nombre descriptivo del evento (ej: Culto Dominical, Reunión de Jóvenes)</div>
+                                    {% if form.nombre_evento.errors %}
+                                        <div class="text-danger mt-1">{{ form.nombre_evento.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                        <i class="fas fa-align-left"></i>
+                                        {{ form.descripcion.label }}
+                                    </label>
+                                    {{ form.descripcion }}
+                                    <div class="help-text">Describe el propósito y detalles importantes del evento</div>
+                                    {% if form.descripcion.errors %}
+                                        <div class="text-danger mt-1">{{ form.descripcion.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Fecha y Ubicación -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Fecha y Ubicación
+                                </h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.fecha_evento.id_for_label }}" class="form-label required-field">
+                                                <i class="fas fa-calendar"></i>
+                                                {{ form.fecha_evento.label }}
+                                            </label>
+                                            {{ form.fecha_evento }}
+                                            {% if form.fecha_evento.errors %}
+                                                <div class="text-danger mt-1">{{ form.fecha_evento.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.ubicacion.id_for_label }}" class="form-label">
+                                                <i class="fas fa-building"></i>
+                                                {{ form.ubicacion.label }}
+                                            </label>
+                                            {{ form.ubicacion }}
+                                            <div class="help-text">Lugar donde se realizará el evento</div>
+                                            {% if form.ubicacion.errors %}
+                                                <div class="text-danger mt-1">{{ form.ubicacion.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Organización -->
+                            <div class="form-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-users"></i>
+                                    Organización
+                                </h3>
+                                
+                                <div class="form-group">
+                                    <label for="{{ form.id_grupo_responsable.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user-tie"></i>
+                                        {{ form.id_grupo_responsable.label }}
+                                    </label>
+                                    {{ form.id_grupo_responsable }}
+                                    <div class="help-text">Grupo encargado de organizar y coordinar el evento</div>
+                                    {% if form.id_grupo_responsable.errors %}
+                                        <div class="text-danger mt-1">{{ form.id_grupo_responsable.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-check">
+                                    {{ form.publico }}
+                                    <label class="form-check-label" for="{{ form.publico.id_for_label }}">
+                                        <i class="fas fa-globe"></i>
+                                        {{ form.publico.label }}
+                                        <div class="help-text mt-1">Los eventos públicos son visibles para toda la comunidad</div>
+                                    </label>
+                                    {% if form.publico.errors %}
+                                        <div class="text-danger mt-1">{{ form.publico.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Vista Previa -->
+                            <div class="preview-section" id="previewSection" style="display: none;">
+                                <h4 class="preview-title">
+                                    <i class="fas fa-eye"></i>
+                                    Vista Previa del Evento
+                                </h4>
+                                <div class="preview-content" id="previewContent">
+                                    <!-- El contenido se llenará dinámicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Botones de Acción -->
+                            <div class="btn-group-custom">
+                                <button type="submit" class="btn-custom btn-primary-custom">
+                                    <i class="fas fa-save"></i>
+                                    Crear Evento
+                                </button>
+                                <a href="{% url 'listar_eventos' %}" class="btn-custom btn-secondary-custom">
+                                    <i class="fas fa-times"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Vista previa en tiempo real
+        function updatePreview() {
+            const nombre = document.getElementById('id_nombre_evento').value;
+            const descripcion = document.getElementById('id_descripcion').value;
+            const fecha = document.getElementById('id_fecha_evento').value;
+            const ubicacion = document.getElementById('id_ubicacion').value;
+            const publico = document.getElementById('id_publico').checked;
+            
+            if (nombre || descripcion || fecha || ubicacion) {
+                const previewSection = document.getElementById('previewSection');
+                const previewContent = document.getElementById('previewContent');
+                
+                let fechaFormateada = '';
+                if (fecha) {
+                    const fechaObj = new Date(fecha);
+                    fechaFormateada = fechaObj.toLocaleString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+                
+                previewContent.innerHTML = `
+                    <h5 class="mb-3">
+                        <i class="fas fa-calendar-alt text-primary"></i>
+                        ${nombre || 'Nombre del evento'}
+                        ${publico ? '<span class="badge bg-success ms-2"><i class="fas fa-globe"></i> Público</span>' : '<span class="badge bg-secondary ms-2"><i class="fas fa-lock"></i> Privado</span>'}
+                    </h5>
+                    ${descripcion ? `<p class="mb-2"><strong>Descripción:</strong> ${descripcion}</p>` : ''}
+                    ${fechaFormateada ? `<p class="mb-2"><strong><i class="fas fa-clock"></i> Fecha:</strong> ${fechaFormateada}</p>` : ''}
+                    ${ubicacion ? `<p class="mb-0"><strong><i class="fas fa-map-marker-alt"></i> Ubicación:</strong> ${ubicacion}</p>` : ''}
+                `;
+                
+                previewSection.style.display = 'block';
+            } else {
+                document.getElementById('previewSection').style.display = 'none';
+            }
+        }
+        
+        // Agregar event listeners para la vista previa
+        document.addEventListener('DOMContentLoaded', function() {
+            const campos = ['id_nombre_evento', 'id_descripcion', 'id_fecha_evento', 'id_ubicacion', 'id_publico'];
+            campos.forEach(campo => {
+                const elemento = document.getElementById(campo);
+                if (elemento) {
+                    elemento.addEventListener('input', updatePreview);
+                    elemento.addEventListener('change', updatePreview);
+                }
+            });
+        });
+        
+        // Validación del formulario
+        document.getElementById('eventoForm').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('id_nombre_evento').value.trim();
+            const fecha = document.getElementById('id_fecha_evento').value;
+            
+            if (!nombre) {
+                e.preventDefault();
+                alert('Por favor, ingresa el nombre del evento.');
+                document.getElementById('id_nombre_evento').focus();
+                return;
+            }
+            
+            if (!fecha) {
+                e.preventDefault();
+                alert('Por favor, selecciona la fecha y hora del evento.');
+                document.getElementById('id_fecha_evento').focus();
+                return;
+            }
+            
+            // Validar que la fecha no sea en el pasado
+            const fechaEvento = new Date(fecha);
+            const ahora = new Date();
+            
+            if (fechaEvento < ahora) {
+                e.preventDefault();
+                alert('La fecha del evento no puede ser en el pasado.');
+                document.getElementById('id_fecha_evento').focus();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

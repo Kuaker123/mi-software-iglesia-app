@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}💰 Detalle Contribución - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'listar_contribuciones' %}">💰 Contribuciones</a></li>
+    <li class="breadcrumb-item active">Detalle</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">💰 Detalle de Contribución</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>👤 Información del Miembro</h5>
+                            <p><strong>Nombre:</strong> {{ miembro.nombre }} {{ miembro.apellido }}</p>
+                            <p><strong>Email:</strong> {{ miembro.email|default:"No especificado" }}</p>
+                            <p><strong>Teléfono:</strong> {{ miembro.telefono|default:"No especificado" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>💰 Detalles de la Contribución</h5>
+                            <p><strong>Cantidad:</strong> ${{ contribucion.cantidad|floatformat:2 }}</p>
+                            <p><strong>Tipo:</strong> {{ contribucion.tipo_contribucion }}</p>
+                            <p><strong>Fecha:</strong> {{ contribucion.fecha_contribucion|date:"d/m/Y" }}</p>
+                            <p><strong>Método de Pago:</strong> {{ contribucion.metodo_pago|default:"Efectivo" }}</p>
+                            {% if contribucion.concepto %}
+                                <p><strong>Concepto:</strong> {{ contribucion.concepto }}</p>
+                            {% endif %}
+                            {% if contribucion.observaciones %}
+                                <p><strong>Observaciones:</strong> {{ contribucion.observaciones }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'listar_contribuciones' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la Lista
+                    </a>
+                    <a href="{% url 'editar_contribucion' contribucion.id_contribucion %}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'eliminar_contribucion' contribucion.id_contribucion %}" class="btn btn-danger" 
+                       onclick="return confirm('⚠️ ¿Estás seguro de eliminar esta contribución?')">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

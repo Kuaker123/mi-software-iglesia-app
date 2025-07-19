@@ -1,0 +1,757 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}🏠 Dashboard - Sistema Iglesia{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">🏠 Dashboard</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Variables CSS Mejoradas */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --card-shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+        --border-radius: 20px;
+        --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* Welcome Hero Section */
+    .welcome-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        opacity: 0.8;
+    }
+
+    .welcome-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .welcome-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .welcome-hero p {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin: 0;
+        font-weight: 300;
+    }
+
+    .welcome-time {
+        font-size: 1.1rem;
+        opacity: 0.8;
+        margin-top: 1rem;
+        font-weight: 400;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Stats Grid Mejorado */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--primary-gradient);
+    }
+
+    .stat-card:nth-child(1)::before { background: var(--success-gradient); }
+    .stat-card:nth-child(2)::before { background: var(--info-gradient); }
+    .stat-card:nth-child(3)::before { background: var(--warning-gradient); }
+    .stat-card:nth-child(4)::before { background: var(--danger-gradient); }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        position: relative;
+    }
+
+    .stat-card:nth-child(1) .stat-icon { background: var(--success-gradient); }
+    .stat-card:nth-child(2) .stat-icon { background: var(--info-gradient); }
+    .stat-card:nth-child(3) .stat-icon { background: var(--warning-gradient); }
+    .stat-card:nth-child(4) .stat-icon { background: var(--danger-gradient); }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        display: block;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stat-trend {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .trend-up { color: #10b981; }
+    .trend-down { color: #ef4444; }
+
+    /* Content Grid Mejorado */
+    .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .content-section {
+        background: white;
+        padding: 2.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .content-section:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #1e293b;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #f1f5f9;
+    }
+
+    .section-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .list-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: var(--transition);
+        border-radius: 15px;
+        margin-bottom: 1rem;
+        background: #fafbfc;
+    }
+
+    .list-item:hover {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        transform: translateX(10px);
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .list-item-title {
+        color: #1e293b;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .list-item-meta {
+        color: #64748b;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Empty State Mejorado */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.6;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .empty-text {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    /* Botones Mejorados */
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        border-radius: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Quick Actions Section - COMPLETAMENTE REDISEÑADA */
+    .quick-actions-section {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 3rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .quick-actions-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .quick-actions-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .quick-actions-subtitle {
+        color: #64748b;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .quick-action {
+        background: white;
+        border: none;
+        padding: 2.5rem 2rem;
+        border-radius: var(--border-radius);
+        text-align: center;
+        transition: var(--transition);
+        text-decoration: none;
+        color: #334155;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        cursor: pointer;
+    }
+
+    .quick-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .quick-action:hover::before {
+        transform: scaleX(1);
+    }
+
+    .quick-action:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: var(--card-shadow-hover);
+        color: #334155;
+        text-decoration: none;
+    }
+
+    .action-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        display: block;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: var(--transition);
+    }
+
+    .quick-action:hover .action-icon {
+        transform: scale(1.2) rotate(5deg);
+    }
+
+    .action-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .action-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+    /* Colores específicos para cada acción */
+    .quick-action:nth-child(1) .action-icon { background: var(--success-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .quick-action:nth-child(2) .action-icon { background: var(--info-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .quick-action:nth-child(3) .action-icon { background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .quick-action:nth-child(4) .action-icon { background: var(--danger-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .quick-action:nth-child(5) .action-icon { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .quick-action:nth-child(6) .action-icon { background: linear-gradient(135deg, #8b5cf6, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .quick-action:nth-child(1)::before { background: var(--success-gradient); }
+    .quick-action:nth-child(2)::before { background: var(--info-gradient); }
+    .quick-action:nth-child(3)::before { background: var(--warning-gradient); }
+    .quick-action:nth-child(4)::before { background: var(--danger-gradient); }
+    .quick-action:nth-child(5)::before { background: var(--primary-gradient); }
+    .quick-action:nth-child(6)::before { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .welcome-hero {
+            padding: 2rem 1rem;
+        }
+        
+        .welcome-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .quick-actions-section {
+            padding: 2rem 1rem;
+        }
+    }
+
+    /* Animaciones adicionales */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card, .content-section, .quick-action {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Hero Banner -->
+<div class="welcome-hero">
+    <div class="welcome-hero-content">
+        <h1>
+            ⛪ ¡Bienvenido al Sistema de Gestión!
+        </h1>
+        <p>🚀 Administra eficientemente los miembros, grupos y contribuciones de tu iglesia</p>
+        <div class="welcome-time">
+            📅 {{ "now"|date:"l, d \de F \de Y" }} • ⏰ {{ "now"|date:"H:i" }}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            👥
+        </div>
+        <span class="stat-number">{{ total_miembros }}</span>
+        <div class="stat-label">👨‍👩‍👧‍👦 Total Miembros</div>
+        <div class="stat-trend trend-up">
+            📈 +5% este mes
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            ✅
+        </div>
+        <span class="stat-number">{{ miembros_activos }}</span>
+        <div class="stat-label">🔥 Miembros Activos</div>
+        <div class="stat-trend trend-up">
+            📈 +12% este mes
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            👫
+        </div>
+        <span class="stat-number">{{ total_grupos }}</span>
+        <div class="stat-label">🏘️ Total Grupos</div>
+        <div class="stat-trend trend-up">
+            📈 +2 nuevos
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            💰
+        </div>
+        <span class="stat-number">{{ total_contribuciones }}</span>
+        <div class="stat-label">🎁 Contribuciones</div>
+        <div class="stat-trend trend-up">
+            📈 +8% este mes
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions - SECCIÓN COMPLETAMENTE REDISEÑADA -->
+<div class="quick-actions-section">
+    <div class="quick-actions-header">
+        <h2 class="quick-actions-title">🚀 Acciones Rápidas</h2>
+        <p class="quick-actions-subtitle">Accede rápidamente a las funciones más utilizadas</p>
+    </div>
+    
+    <div class="actions-grid">
+        <a href="{% url 'crear_miembro' %}" class="quick-action">
+            <div class="action-icon">👤</div>
+            <div class="action-title">Nuevo Miembro</div>
+            <div class="action-description">Registra un nuevo miembro en la iglesia</div>
+        </a>
+        
+        <a href="{% url 'crear_grupo' %}" class="quick-action">
+            <div class="action-icon">👥</div>
+            <div class="action-title">Nuevo Grupo</div>
+            <div class="action-description">Crea un nuevo grupo o ministerio</div>
+        </a>
+        
+        <a href="{% url 'crear_contribucion' %}" class="quick-action">
+            <div class="action-icon">💰</div>
+            <div class="action-title">Nueva Contribución</div>
+            <div class="action-description">Registra diezmos y ofrendas</div>
+        </a>
+        
+        <a href="{% url 'dashboard_financiero' %}" class="quick-action">
+            <div class="action-icon">📊</div>
+            <div class="action-title">Dashboard Financiero</div>
+            <div class="action-description">Visualiza reportes financieros</div>
+        </a>
+        
+        <a href="{% url 'dashboard_comunicaciones' %}" class="quick-action">
+            <div class="action-icon">📧</div>
+            <div class="action-title">Comunicaciones</div>
+            <div class="action-description">Envía mensajes y notificaciones</div>
+        </a>
+        
+        <a href="/admin/" class="quick-action">
+            <div class="action-icon">⚙️</div>
+            <div class="action-title">Administración</div>
+            <div class="action-description">Panel de administración avanzado</div>
+        </a>
+    </div>
+</div>
+
+<!-- Content Sections -->
+<div class="content-grid">
+    <!-- Recent Members -->
+    <div class="content-section">
+        <div class="section-header">
+            <div class="section-icon">
+                👤
+            </div>
+            <span>🆕 Últimos Miembros Registrados</span>
+        </div>
+        
+        {% if ultimos_miembros %}
+            {% for miembro in ultimos_miembros %}
+                <div class="list-item">
+                    <div class="list-item-title">
+                        👋 {{ miembro.nombre }} {{ miembro.apellido }}
+                    </div>
+                    <div class="list-item-meta">
+                        <span class="meta-item">
+                            📅 {{ miembro.fecha_ingreso|date:"d/m/Y" }}
+                        </span>
+                        <span class="meta-item">
+                            📧 {{ miembro.email|default:"Sin email" }}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    😔
+                </div>
+                <div class="empty-text">No hay miembros registrados</div>
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'listar_miembros' %}" class="btn-primary">
+            👀 Ver todos los miembros
+        </a>
+    </div>
+    
+    <!-- Recent Groups -->
+    <div class="content-section">
+        <div class="section-header">
+            <div class="section-icon">
+                👥
+            </div>
+            <span>🆕 Últimos Grupos Creados</span>
+        </div>
+        
+        {% if ultimos_grupos %}
+            {% for grupo in ultimos_grupos %}
+                <div class="list-item">
+                    <div class="list-item-title">
+                        🏘️ {{ grupo.nombre_grupo }}
+                    </div>
+                    <div class="list-item-meta">
+                        <span class="meta-item">
+                            👨‍💼 {{ grupo.id_lider|default:"Sin líder" }}
+                        </span>
+                        <span class="meta-item">
+                            📅 {{ grupo.fecha_creacion|date:"d/m/Y" }}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    😔
+                </div>
+                <div class="empty-text">No hay grupos registrados</div>
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'listar_grupos' %}" class="btn-primary">
+            👀 Ver todos los grupos
+        </a>
+    </div>
+    
+    <!-- Recent Contributions -->
+    <div class="content-section">
+        <div class="section-header">
+            <div class="section-icon">
+                💰
+            </div>
+            <span>🆕 Últimas Contribuciones</span>
+        </div>
+        
+        {% if ultimas_contribuciones %}
+            {% for contribucion in ultimas_contribuciones %}
+                <div class="list-item">
+                    <div class="list-item-title">
+                        💵 ${{ contribucion.cantidad|floatformat:2 }} - {{ contribucion.tipo_contribucion }}
+                    </div>
+                    <div class="list-item-meta">
+                        <span class="meta-item">
+                            👤 {{ contribucion.id_miembro.nombre }}
+                        </span>
+                        <span class="meta-item">
+                            📅 {{ contribucion.fecha_contribucion|date:"d/m/Y" }}
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    😔
+                </div>
+                <div class="empty-text">No hay contribuciones registradas</div>
+            </div>
+        {% endif %}
+        
+        <a href="{% url 'listar_contribuciones' %}" class="btn-primary">
+            👀 Ver todas las contribuciones
+        </a>
+    </div>
+</div>
+
+<script>
+// Agregar efectos de animación al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    // Animar números de estadísticas
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        let currentValue = 0;
+        const increment = finalValue / 50;
+        const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= finalValue) {
+                stat.textContent = finalValue;
+                clearInterval(timer);
+            } else {
+                stat.textContent = Math.floor(currentValue);
+            }
+        }, 30);
+    });
+    
+    // Agregar efecto de hover mejorado a las tarjetas
+    const cards = document.querySelectorAll('.stat-card, .content-section');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Efecto especial para acciones rápidas
+    const quickActions = document.querySelectorAll('.quick-action');
+    quickActions.forEach(action => {
+        action.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.05)';
+        });
+        
+        action.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+</script>
+{% endblock %}

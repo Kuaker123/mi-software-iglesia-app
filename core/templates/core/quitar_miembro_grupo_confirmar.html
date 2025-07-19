@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quitar Miembro - Sistema Iglesia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #667eea;
+            margin-right: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #764ba2;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        .confirm-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .warning-icon {
+            font-size: 4rem;
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        .confirm-title {
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        .confirm-message {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .miembro-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ffc107;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🏛️ Sistema de Gestión Iglesia</h1>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="container">
+            <a href="{% url 'dashboard' %}">🏠 Inicio</a>
+            <a href="{% url 'listar_miembros' %}">👥 Miembros</a>
+            <a href="{% url 'listar_grupos' %}">👨‍👩‍👧‍👦 Grupos</a>
+            <a href="{% url 'listar_contribuciones' %}">💰 Contribuciones</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="confirm-container">
+            <div class="warning-icon">👤</div>
+            <h2 class="confirm-title">Quitar Miembro del Grupo</h2>
+            
+            <div class="confirm-message">
+                <p>¿Estás seguro de que deseas quitar a <strong>{{ miembro_grupo.id_miembro.nombre }} {{ miembro_grupo.id_miembro.apellido }}</strong> del grupo <strong>"{{ grupo.nombre_grupo }}"</strong>?</p>
+                <p>El miembro será removido del grupo pero no será eliminado del sistema.</p>
+            </div>
+            
+            <div class="miembro-info">
+                <h4>Información:</h4>
+                <p><strong>Miembro:</strong> {{ miembro_grupo.id_miembro.nombre }} {{ miembro_grupo.id_miembro.apellido }}</p>
+                <p><strong>Grupo:</strong> {{ grupo.nombre_grupo }}</p>
+                <p><strong>Se unió:</strong> {{ miembro_grupo.fecha_union|date:"d/m/Y" }}</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-warning">👤 Sí, Quitar del Grupo</button>
+                    <a href="{% url 'detalle_grupo' grupo.id_grupo %}" class="btn btn-secondary">❌ Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

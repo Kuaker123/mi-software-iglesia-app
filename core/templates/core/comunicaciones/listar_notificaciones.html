@@ -1,0 +1,198 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-bell"></i>
+                        Notificaciones
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'crear_notificacion' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Nueva Notificación
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="get" class="form-inline">
+                                <div class="form-group mr-3">
+                                    <input type="text" name="buscar" class="form-control" 
+                                           placeholder="Buscar notificaciones..." value="{{ request.GET.buscar }}">
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="tipo" class="form-control">
+                                        <option value="">Todos los tipos</option>
+                                        <option value="info" {% if request.GET.tipo == 'info' %}selected{% endif %}>Información</option>
+                                        <option value="warning" {% if request.GET.tipo == 'warning' %}selected{% endif %}>Advertencia</option>
+                                        <option value="error" {% if request.GET.tipo == 'error' %}selected{% endif %}>Error</option>
+                                        <option value="success" {% if request.GET.tipo == 'success' %}selected{% endif %}>Éxito</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="leida" class="form-control">
+                                        <option value="">Todas</option>
+                                        <option value="false" {% if request.GET.leida == 'false' %}selected{% endif %}>No leídas</option>
+                                        <option value="true" {% if request.GET.leida == 'true' %}selected{% endif %}>Leídas</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-outline-primary mr-2">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <a href="{% url 'listar_notificaciones' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if notificaciones %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Estado</th>
+                                        <th>Tipo</th>
+                                        <th>Título</th>
+                                        <th>Mensaje</th>
+                                        <th>Usuario</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for notificacion in notificaciones %}
+                                        <tr class="{% if not notificacion.leida %}table-warning{% endif %}">
+                                            <td>
+                                                {% if notificacion.leida %}
+                                                    <i class="fas fa-envelope-open text-muted"></i>
+                                                {% else %}
+                                                    <i class="fas fa-envelope text-primary"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if notificacion.tipo == 'info' %}
+                                                    <span class="badge badge-info">Info</span>
+                                                {% elif notificacion.tipo == 'warning' %}
+                                                    <span class="badge badge-warning">Advertencia</span>
+                                                {% elif notificacion.tipo == 'error' %}
+                                                    <span class="badge badge-danger">Error</span>
+                                                {% elif notificacion.tipo == 'success' %}
+                                                    <span class="badge badge-success">Éxito</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ notificacion.titulo }}</td>
+                                            <td>{{ notificacion.mensaje|truncatewords:10 }}</td>
+                                            <td>{{ notificacion.usuario.get_full_name|default:notificacion.usuario.username }}</td>
+                                            <td>{{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    {% if not notificacion.leida %}
+                                                        <button type="button" class="btn btn-outline-primary" 
+                                                                onclick="marcarLeida({{ notificacion.id }})">
+                                                            <i class="fas fa-check"></i> Marcar leída
+                                                        </button>
+                                                    {% endif %}
+                                                    <button type="button" class="btn btn-outline-danger" 
+                                                            onclick="eliminarNotificacion({{ notificacion.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        {% if notificaciones.has_other_pages %}
+                            <nav aria-label="Paginación de notificaciones">
+                                <ul class="pagination justify-content-center">
+                                    {% if notificaciones.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ notificaciones.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.leida %}&leida={{ request.GET.leida }}{% endif %}">
+                                                Anterior
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in notificaciones.paginator.page_range %}
+                                        {% if notificaciones.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > notificaciones.number|add:'-3' and num < notificaciones.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.leida %}&leida={{ request.GET.leida }}{% endif %}">
+                                                    {{ num }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if notificaciones.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ notificaciones.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.leida %}&leida={{ request.GET.leida }}{% endif %}">
+                                                Siguiente
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-bell fa-3x text-muted mb-3"></i>
+                            <h4>No hay notificaciones</h4>
+                            <p class="text-muted">No tienes notificaciones en este momento.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function marcarLeida(notificacionId) {
+    // Aquí podrías hacer una petición AJAX para marcar como leída
+    $.post('/comunicaciones/notificaciones/' + notificacionId + '/marcar-leida/', {
+        'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+    }).done(function() {
+        location.reload();
+    });
+}
+
+function eliminarNotificacion(notificacionId) {
+    if (confirm('¿Está seguro de que desea eliminar esta notificación?')) {
+        $.post('/comunicaciones/notificaciones/' + notificacionId + '/eliminar/', {
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        }).done(function() {
+            location.reload();
+        });
+    }
+}
+</script>
+{% endblock %}

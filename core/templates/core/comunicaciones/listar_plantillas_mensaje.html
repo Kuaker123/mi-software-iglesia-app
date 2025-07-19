@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Plantillas de Mensaje{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-alt"></i>
+                        Plantillas de Mensaje
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'crear_plantilla_mensaje' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Nueva Plantilla
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <form method="get" class="form-inline">
+                                <div class="form-group mr-3">
+                                    <input type="text" name="buscar" class="form-control" 
+                                           placeholder="Buscar plantillas..." value="{{ request.GET.buscar }}">
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="categoria" class="form-control">
+                                        <option value="">Todas las categorías</option>
+                                        <option value="evento" {% if request.GET.categoria == 'evento' %}selected{% endif %}>Evento</option>
+                                        <option value="anuncio" {% if request.GET.categoria == 'anuncio' %}selected{% endif %}>Anuncio</option>
+                                        <option value="invitacion" {% if request.GET.categoria == 'invitacion' %}selected{% endif %}>Invitación</option>
+                                        <option value="recordatorio" {% if request.GET.categoria == 'recordatorio' %}selected{% endif %}>Recordatorio</option>
+                                        <option value="otro" {% if request.GET.categoria == 'otro' %}selected{% endif %}>Otro</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-outline-primary mr-2">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <a href="{% url 'listar_plantillas_mensaje' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if plantillas %}
+                        <div class="row">
+                            {% for plantilla in plantillas %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="card-title mb-0">{{ plantilla.nombre }}</h5>
+                                            <span class="badge badge-info">{{ plantilla.get_tipo_display }}</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2 text-muted">{{ plantilla.asunto }}</h6>
+                                            <p class="card-text">{{ plantilla.contenido_html|truncatewords:20|striptags }}</p>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-success" 
+                                                        onclick="usarPlantilla({{ plantilla.id_plantilla }})">
+                                                    <i class="fas fa-paper-plane"></i> Usar
+                                                </button>
+                                                <a href="{% url 'editar_plantilla_mensaje' plantilla.id_plantilla %}" 
+                                                   class="btn btn-warning">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </a>
+                                                <button type="button" class="btn btn-danger" 
+                                                        onclick="eliminarPlantilla({{ plantilla.id_plantilla }})">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </div>
+                                            <small class="text-muted d-block mt-2">
+                                                Creada: {{ plantilla.fecha_creacion|date:"d/m/Y" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Paginación -->
+                        {% if plantillas.has_other_pages %}
+                            <nav aria-label="Paginación de plantillas">
+                                <ul class="pagination justify-content-center">
+                                    {% if plantillas.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ plantillas.previous_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                                                Anterior
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in plantillas.paginator.page_range %}
+                                        {% if plantillas.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > plantillas.number|add:'-3' and num < plantillas.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                                                    {{ num }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if plantillas.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ plantillas.next_page_number }}{% if request.GET.buscar %}&buscar={{ request.GET.buscar }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                                                Siguiente
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h4>No hay plantillas disponibles</h4>
+                            <p class="text-muted">Crea tu primera plantilla de mensaje para comenzar.</p>
+                            <a href="{% url 'crear_plantilla_mensaje' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Primera Plantilla
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function usarPlantilla(plantillaId) {
+    // Redirigir a crear mensaje con plantilla
+    window.location.href = '{% url "crear_mensaje" %}?plantilla=' + plantillaId;
+}
+
+function eliminarPlantilla(plantillaId) {
+    if (confirm('¿Está seguro de que desea eliminar esta plantilla?')) {
+        // Aquí podrías hacer una petición AJAX o redirigir a una vista de eliminación
+        window.location.href = '/comunicaciones/plantillas/' + plantillaId + '/eliminar/';
+    }
+}
+</script>
+{% endblock %}

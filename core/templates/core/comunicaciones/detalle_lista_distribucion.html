@@ -1,0 +1,179 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ lista.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">{{ lista.nombre }}</h1>
+                <div>
+                    <a href="{% url 'editar_lista_distribucion' lista.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'listar_listas_distribucion' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Información de la Lista -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Información de la Lista</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nombre:</strong> {{ lista.nombre }}</p>
+                            <p><strong>Descripción:</strong> {{ lista.descripcion|default:"Sin descripción" }}</p>
+                            <p><strong>Estado:</strong> 
+                                {% if lista.activa %}
+                                    <span class="badge badge-success">Activa</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Inactiva</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Fecha de Creación:</strong> {{ lista.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Total de Miembros:</strong> <span class="badge badge-info">{{ miembros.count }}</span></p>
+                            <p><strong>Filtros Activos:</strong></p>
+                            <ul class="list-unstyled ml-3">
+                                {% if lista.incluir_solo_activos %}
+                                    <li><i class="fas fa-check text-success"></i> Solo miembros activos</li>
+                                {% endif %}
+                                {% if lista.incluir_solo_con_email %}
+                                    <li><i class="fas fa-envelope text-info"></i> Solo con email</li>
+                                {% endif %}
+                                {% if lista.incluir_grupos.exists %}
+                                    <li><i class="fas fa-users text-primary"></i> Grupos específicos</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Miembros de la Lista -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Miembros ({{ miembros.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if miembros %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Estado</th>
+                                    <th>Grupos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for miembro in miembros %}
+                                <tr>
+                                    <td>{{ miembro.nombre }} {{ miembro.apellido }}</td>
+                                    <td>{{ miembro.email|default:"Sin email" }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if miembro.estado == 'Activo' %}success{% else %}secondary{% endif %}">
+                                            {{ miembro.estado }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% for grupo in miembro.miembrogrupo_set.all %}
+                                            <span class="badge badge-outline-primary">{{ grupo.id_grupo.nombre }}</span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay miembros en esta lista</h5>
+                        <p class="text-muted">Los filtros configurados no coinciden con ningún miembro.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Grupos Incluidos -->
+            {% if lista.incluir_grupos.exists %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Grupos Incluidos</h5>
+                </div>
+                <div class="card-body">
+                    {% for grupo in lista.incluir_grupos.all %}
+                        <span class="badge badge-primary mb-1">{{ grupo.nombre }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Acciones -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Acciones</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'crear_mensaje' %}?lista={{ lista.id }}" class="btn btn-success btn-block mb-2">
+                        <i class="fas fa-envelope"></i> Enviar Mensaje
+                    </a>
+                    <button class="btn btn-info btn-block mb-2" onclick="previewLista({{ lista.id }})">
+                        <i class="fas fa-eye"></i> Vista Previa
+                    </button>
+                    <a href="{% url 'editar_lista_distribucion' lista.id %}" class="btn btn-primary btn-block">
+                        <i class="fas fa-edit"></i> Editar Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Vista Previa -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Vista Previa de Miembros</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Contenido cargado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewLista(listaId) {
+    fetch(`/core/comunicaciones/api/preview-lista/${listaId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('previewContent').innerHTML = data.html;
+            $('#previewModal').modal('show');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar la vista previa');
+        });
+}
+</script>
+{% endblock %}

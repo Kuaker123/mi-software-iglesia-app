@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ miembro.nombre }} {{ miembro.apellido }} - Detalle del Miembro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .nav-breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-breadcrumb a:hover {
+            color: #764ba2;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .member-status {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-activo {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-inactivo {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-pendiente {
+            background: #feebc8;
+            color: #7b341e;
+        }
+
+        .header-subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #2d3748;
+            font-weight: 500;
+            padding: 10px 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-value.empty {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* Stats Card */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Action Buttons */
+        .actions-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .actions-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .actions-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .info-card, .stats-card, .actions-card {
+                padding: 20px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-card, .stats-card, .actions-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .stats-card {
+            animation-delay: 0.2s;
+        }
+
+        .actions-card {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <nav class="nav-breadcrumb">
+                <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
+                <span>›</span>
+                <a href="{% url 'listar_miembros' %}">👥 Miembros</a>
+                <span>›</span>
+                <span>👤 {{ miembro.nombre }} {{ miembro.apellido }}</span>
+            </nav>
+            
+            <h1>
+                👤 {{ miembro.nombre }} {{ miembro.apellido }}
+                <span class="member-status status-{{ miembro.estado|lower }}">
+                    {{ miembro.get_estado_display }}
+                </span>
+            </h1>
+            <p class="header-subtitle">
+                Miembro desde {{ miembro.fecha_ingreso|date:"d/m/Y" }}
+            </p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-grid">
+            <!-- Member Information -->
+            <div class="info-card">
+                <h2 class="card-title">
+                    📋 Información Personal
+                </h2>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            📧 Email
+                        </div>
+                        <div class="info-value {% if not miembro.email %}empty{% endif %}">
+                            {{ miembro.email|default:"No especificado" }}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            📱 Teléfono
+                        </div>
+                        <div class="info-value {% if not miembro.telefono %}empty{% endif %}">
+                            {{ miembro.telefono|default:"No especificado" }}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            📅 Fecha de Nacimiento
+                        </div>
+                        <div class="info-value {% if not miembro.fecha_nacimiento %}empty{% endif %}">
+                            {% if miembro.fecha_nacimiento %}
+                                {{ miembro.fecha_nacimiento|date:"d/m/Y" }}
+                                {% now "Y" as current_year %}
+                                {% if miembro.fecha_nacimiento %}
+                                    ({{ current_year|add:"-1"|add:miembro.fecha_nacimiento.year|add:"-1" }} años)
+                                {% endif %}
+                            {% else %}
+                                No especificada
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            ⚧️ Género
+                        </div>
+                        <div class="info-value {% if not miembro.genero %}empty{% endif %}">
+                            {{ miembro.get_genero_display|default:"No especificado" }}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            📍 Dirección
+                        </div>
+                        <div class="info-value {% if not miembro.direccion %}empty{% endif %}">
+                            {{ miembro.direccion|default:"No especificada" }}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            📅 Fecha de Ingreso
+                        </div>
+                        <div class="info-value">
+                            {{ miembro.fecha_ingreso|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div>
+                <!-- Statistics -->
+                <div class="stats-card">
+                    <h3 class="card-title">
+                        📊 Estadísticas
+                    </h3>
+                    
+                    <div class="stat-item">
+                        <span class="stat-number">0</span>
+                        <span class="stat-label">Contribuciones</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-number">0</span>
+                        <span class="stat-label">Grupos</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-number">0</span>
+                        <span class="stat-label">Eventos</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-card">
+                    <h3 class="card-title">
+                        ⚡ Acciones
+                    </h3>
+                    
+                    <div class="actions-grid">
+                        <a href="{% url 'editar_miembro' miembro.id_miembro %}" class="btn btn-primary">
+                            ✏️ Editar Miembro
+                        </a>
+                        
+                        <a href="{% url 'eliminar_miembro' miembro.id_miembro %}" class="btn btn-danger">
+                            🗑️ Eliminar Miembro
+                        </a>
+                        
+                        <a href="{% url 'listar_miembros' %}" class="btn btn-secondary">
+                            ← Volver a Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

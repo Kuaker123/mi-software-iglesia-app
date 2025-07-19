@@ -1,0 +1,155 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Mensaje{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-envelope-open-text"></i>
+                        Detalle del Mensaje
+                    </h3>
+                    <div class="card-tools">
+                        {% if mensaje.estado == 'borrador' %}
+                            <a href="{% url 'enviar_mensaje' mensaje.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-paper-plane"></i> Enviar
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'listar_mensajes' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>{{ mensaje.asunto }}</h4>
+                            <div class="message-content mt-3">
+                                {{ mensaje.contenido|linebreaks }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Estado</span>
+                                    <span class="info-box-number">
+                                        {% if mensaje.estado == 'borrador' %}
+                                            <span class="badge badge-secondary">Borrador</span>
+                                        {% elif mensaje.estado == 'programado' %}
+                                            <span class="badge badge-warning">Programado</span>
+                                        {% elif mensaje.estado == 'enviado' %}
+                                            <span class="badge badge-success">Enviado</span>
+                                        {% elif mensaje.estado == 'fallido' %}
+                                            <span class="badge badge-danger">Fallido</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Prioridad</span>
+                                    <span class="info-box-number">
+                                        {% if mensaje.prioridad == 'alta' %}
+                                            <span class="badge badge-danger">Alta</span>
+                                        {% elif mensaje.prioridad == 'media' %}
+                                            <span class="badge badge-warning">Media</span>
+                                        {% else %}
+                                            <span class="badge badge-info">Baja</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Lista de Distribución</span>
+                                    <span class="info-box-number">
+                                        <a href="{% url 'detalle_lista_distribucion' mensaje.lista_distribucion.id %}">
+                                            {{ mensaje.lista_distribucion.nombre }}
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Creado por</span>
+                                    <span class="info-box-number">{{ mensaje.creado_por.get_full_name|default:mensaje.creado_por.username }}</span>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Fecha de Creación</span>
+                                    <span class="info-box-number">{{ mensaje.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                </div>
+                            </div>
+
+                            {% if mensaje.fecha_programada %}
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Fecha Programada</span>
+                                        <span class="info-box-number">{{ mensaje.fecha_programada|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if mensaje.fecha_envio %}
+                                <div class="info-box">
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Fecha de Envío</span>
+                                        <span class="info-box-number">{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if seguimientos %}
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Seguimiento de Envíos</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Destinatario</th>
+                                                <th>Estado</th>
+                                                <th>Fecha de Envío</th>
+                                                <th>Error</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for seguimiento in seguimientos %}
+                                                <tr>
+                                                    <td>{{ seguimiento.destinatario }}</td>
+                                                    <td>
+                                                        {% if seguimiento.estado == 'enviado' %}
+                                                            <span class="badge badge-success">Enviado</span>
+                                                        {% elif seguimiento.estado == 'fallido' %}
+                                                            <span class="badge badge-danger">Fallido</span>
+                                                        {% else %}
+                                                            <span class="badge badge-warning">Pendiente</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ seguimiento.fecha_envio|date:"d/m/Y H:i"|default:"-" }}</td>
+                                                    <td>{{ seguimiento.error_mensaje|default:"-" }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

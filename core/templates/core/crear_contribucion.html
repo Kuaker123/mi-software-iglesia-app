@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Contribución - Sistema Iglesia</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb-list {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            list-style: none;
+            margin: 0;
+        }
+
+        .breadcrumb-item {
+            color: #666;
+        }
+
+        .breadcrumb-item a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            color: #999;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control.is-valid {
+            border-color: #28a745;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 1;
+        }
+
+        .input-group .form-control {
+            padding-left: 3rem;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid transparent;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-icon {
+            margin-right: 0.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .contribution-preview {
+            background: #f8f9ff;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="{% url 'dashboard' %}" class="logo">
+                <i class="fas fa-church"></i> Sistema Iglesia
+            </a>
+            <ul class="nav-links">
+                <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{% url 'listar_miembros' %}"><i class="fas fa-users"></i> Miembros</a></li>
+                <li><a href="{% url 'listar_grupos' %}"><i class="fas fa-layer-group"></i> Grupos</a></li>
+                <li><a href="{% url 'listar_contribuciones' %}"><i class="fas fa-hand-holding-usd"></i> Contribuciones</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb fade-in">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Inicio</a></li>
+                <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+                <li class="breadcrumb-item"><a href="{% url 'listar_contribuciones' %}">Contribuciones</a></li>
+                <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+                <li class="breadcrumb-item">Registrar Nueva</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header fade-in">
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle"></i>
+                Registrar Nueva Contribución
+            </h1>
+            <p class="page-subtitle">Registra diezmos, ofrendas y contribuciones especiales</p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-info fade-in">
+            <i class="fas fa-info-circle alert-icon"></i>
+            <strong>Información:</strong> Todos los campos marcados con (*) son obligatorios. La fecha se registrará automáticamente como hoy si no se especifica otra.
+        </div>
+
+        <!-- Form -->
+        <div class="form-container fade-in">
+            <form method="post" id="contributionForm">
+                {% csrf_token %}
+                
+                <!-- Información del Miembro -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Información del Miembro
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.id_miembro.id_for_label }}" class="form-label">
+                            <i class="fas fa-user-circle"></i> Miembro *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-user input-icon"></i>
+                            {{ form.id_miembro }}
+                        </div>
+                        <div class="form-help">Selecciona el miembro que realiza la contribución</div>
+                        {% if form.id_miembro.errors %}
+                            <div class="text-danger">{{ form.id_miembro.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Detalles de la Contribución -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        Detalles de la Contribución
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.es_ingreso.id_for_label }}" class="form-label">
+                            <i class="fas fa-exchange-alt"></i> Tipo de Movimiento *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-exchange-alt input-icon"></i>
+                            {{ form.es_ingreso }}
+                        </div>
+                        <div class="form-help">Selecciona si es un ingreso (contribución) o un gasto</div>
+                        {% if form.es_ingreso.errors %}
+                            <div class="text-danger">{{ form.es_ingreso.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.categoria.id_for_label }}" class="form-label">
+                            <i class="fas fa-tags"></i> Categoría *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-tags input-icon"></i>
+                            {{ form.categoria }}
+                        </div>
+                        <div class="form-help">Selecciona la categoría apropiada para esta transacción</div>
+                        {% if form.categoria.errors %}
+                            <div class="text-danger">{{ form.categoria.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.tipo_contribucion.id_for_label }}" class="form-label">
+                            <i class="fas fa-tag"></i> Tipo de Contribución *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-list input-icon"></i>
+                            {{ form.tipo_contribucion }}
+                        </div>
+                        <div class="form-help">Selecciona el tipo: Diezmo (10% de ingresos), Ofrenda (voluntaria) o Especial (para proyectos específicos)</div>
+                        {% if form.tipo_contribucion.errors %}
+                            <div class="text-danger">{{ form.tipo_contribucion.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.concepto.id_for_label }}" class="form-label">
+                            <i class="fas fa-comment"></i> Concepto *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-comment input-icon"></i>
+                            {{ form.concepto }}
+                        </div>
+                        <div class="form-help">Describe brevemente el concepto de esta contribución</div>
+                        {% if form.concepto.errors %}
+                            <div class="text-danger">{{ form.concepto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.cantidad.id_for_label }}" class="form-label">
+                            <i class="fas fa-dollar-sign"></i> Cantidad *
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-dollar-sign input-icon"></i>
+                            {{ form.cantidad }}
+                        </div>
+                        <div class="form-help">Ingresa el monto de la contribución (ejemplo: 150.00)</div>
+                        {% if form.cantidad.errors %}
+                            <div class="text-danger">{{ form.cantidad.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.metodo_pago.id_for_label }}" class="form-label">
+                            <i class="fas fa-credit-card"></i> Método de Pago
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-credit-card input-icon"></i>
+                            {{ form.metodo_pago }}
+                        </div>
+                        <div class="form-help">Selecciona cómo se realizó el pago</div>
+                        {% if form.metodo_pago.errors %}
+                            <div class="text-danger">{{ form.metodo_pago.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.fecha_contribucion.id_for_label }}" class="form-label">
+                            <i class="fas fa-calendar"></i> Fecha de Contribución
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-calendar input-icon"></i>
+                            {{ form.fecha_contribucion }}
+                        </div>
+                        <div class="form-help">Si no se especifica, se usará la fecha actual</div>
+                        {% if form.fecha_contribucion.errors %}
+                            <div class="text-danger">{{ form.fecha_contribucion.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Información Adicional (Opcional)
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.numero_recibo.id_for_label }}" class="form-label">
+                            <i class="fas fa-receipt"></i> Número de Recibo
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-receipt input-icon"></i>
+                            {{ form.numero_recibo }}
+                        </div>
+                        <div class="form-help">Número de recibo o comprobante (opcional)</div>
+                        {% if form.numero_recibo.errors %}
+                            <div class="text-danger">{{ form.numero_recibo.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Observaciones
+                        </label>
+                        {{ form.observaciones }}
+                        <div class="form-help">Notas adicionales sobre esta contribución (opcional)</div>
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger">{{ form.observaciones.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Vista Previa -->
+                <div class="contribution-preview" id="contributionPreview">
+                    <div class="preview-title">
+                        <i class="fas fa-eye"></i>
+                        Vista Previa de la Contribución
+                    </div>
+                    <div class="preview-item">
+                        <span>Miembro:</span>
+                        <span id="previewMember">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Tipo:</span>
+                        <span id="previewType">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Fecha:</span>
+                        <span id="previewDate">-</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Total:</span>
+                        <span id="previewAmount">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Registrar Contribución
+                    </button>
+                    <a href="{% url 'listar_contribuciones' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contributionForm');
+            const preview = document.getElementById('contributionPreview');
+            const memberSelect = document.querySelector('select[name="id_miembro"]');
+            const typeSelect = document.querySelector('select[name="tipo_contribucion"]');
+            const amountInput = document.querySelector('input[name="cantidad"]');
+            const dateInput = document.querySelector('input[name="fecha_contribucion"]');
+
+            // Aplicar clases CSS a los campos del formulario
+            const formControls = form.querySelectorAll('select, input[type="text"], input[type="number"], input[type="date"]');
+            formControls.forEach(control => {
+                control.classList.add('form-control');
+            });
+
+            // Función para actualizar la vista previa
+            function updatePreview() {
+                const memberText = memberSelect.options[memberSelect.selectedIndex]?.text || '-';
+                const typeText = typeSelect.options[typeSelect.selectedIndex]?.text || '-';
+                const amountValue = amountInput.value || '0';
+                const dateValue = dateInput.value || new Date().toISOString().split('T')[0];
+
+                document.getElementById('previewMember').textContent = memberText;
+                document.getElementById('previewType').textContent = typeText;
+                document.getElementById('previewDate').textContent = dateValue;
+                document.getElementById('previewAmount').textContent = `$${parseFloat(amountValue).toFixed(2)}`;
+
+                // Mostrar preview si hay datos
+                if (memberSelect.value && typeSelect.value && amountInput.value) {
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+            }
+
+            // Event listeners para actualizar la vista previa
+            memberSelect.addEventListener('change', updatePreview);
+            typeSelect.addEventListener('change', updatePreview);
+            amountInput.addEventListener('input', updatePreview);
+            dateInput.addEventListener('change', updatePreview);
+
+            // Validación en tiempo real
+            amountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                if (value > 0) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                } else {
+                    this.classList.remove('is-valid');
+                    this.classList.add('is-invalid');
+                }
+            });
+
+            // Validación del formulario
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                if (!memberSelect.value) {
+                    memberSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    memberSelect.classList.remove('is-invalid');
+                }
+
+                if (!typeSelect.value) {
+                    typeSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    typeSelect.classList.remove('is-invalid');
+                }
+
+                if (!amountInput.value || parseFloat(amountInput.value) <= 0) {
+                    amountInput.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    amountInput.classList.remove('is-invalid');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Por favor, completa todos los campos obligatorios correctamente.');
+                }
+            });
+
+            // Establecer fecha actual por defecto
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+        });
+    </script>
+</body>
+</html>

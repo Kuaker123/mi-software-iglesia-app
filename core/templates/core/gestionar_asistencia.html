@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Asistencia - {{ evento.nombre_evento }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            padding: 2rem 0;
+        }
+        
+        .attendance-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        .attendance-header {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .attendance-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        
+        .event-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .attendance-body {
+            padding: 2.5rem;
+        }
+        
+        .stats-section {
+            margin-bottom: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--light-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-bg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .add-attendance-form {
+            background: var(--light-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
+        }
+        
+        .btn-custom {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            color: white;
+        }
+        
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--accent-color), #ec7063);
+            color: white;
+        }
+        
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .attendance-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .list-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: white;
+            width: 250px;
+        }
+        
+        .search-box::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .member-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+        
+        .member-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .member-item:last-child {
+            border-bottom: none;
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .member-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .member-details h6 {
+            margin: 0;
+            color: var(--dark-text);
+            font-weight: 600;
+        }
+        
+        .member-details small {
+            color: #6c757d;
+        }
+        
+        .attendance-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-present {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .status-absent {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .attendance-body {
+                padding: 1.5rem;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .list-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="attendance-card">
+                    <div class="attendance-header">
+                        <h1><i class="fas fa-user-check"></i> Gestionar Asistencia</h1>
+                        <div class="event-info">
+                            <h4>{{ evento.nombre_evento }}</h4>
+                            <p><i class="fas fa-calendar"></i> {{ evento.fecha_evento|date:'l, d \d\e F \d\e Y \a \l\a\s H:i' }}</p>
+                            {% if evento.ubicacion %}
+                                <p><i class="fas fa-map-marker-alt"></i> {{ evento.ubicacion }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="attendance-body">
+                        <!-- Estadísticas -->
+                        <div class="stats-section">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_asistentes }}</div>
+                                    <div class="stat-label">Asistentes Registrados</div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ miembros_disponibles.count }}</div>
+                                    <div class="stat-label">Miembros Disponibles</div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ porcentaje_asistencia }}%</div>
+                                    <div class="stat-label">% de Asistencia</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Formulario para Agregar Asistencia -->
+                        {% if miembros_disponibles %}
+                        <div class="section-title">
+                            <i class="fas fa-user-plus"></i>
+                            Registrar Nueva Asistencia
+                        </div>
+                        
+                        <div class="add-attendance-form">
+                            <form method="post" id="attendanceForm">
+                                {% csrf_token %}
+                                <div class="row align-items-end">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="{{ form.id_miembro.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user"></i> Seleccionar Miembro
+                                            </label>
+                                            {{ form.id_miembro }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn-custom btn-success-custom w-100">
+                                            <i class="fas fa-plus"></i>
+                                            Registrar Asistencia
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Lista de Asistentes -->
+                        <div class="section-title">
+                            <i class="fas fa-list"></i>
+                            Lista de Asistentes
+                        </div>
+                        
+                        <div class="attendance-list">
+                            <div class="list-header">
+                                <h5 class="mb-0">Asistentes Registrados ({{ total_asistentes }})</h5>
+                                <input type="text" class="search-box" placeholder="Buscar asistente..." id="searchBox">
+                            </div>
+                            
+                            {% if asistentes %}
+                            <div class="member-list" id="memberList">
+                                {% for asistencia in asistentes %}
+                                <div class="member-item" data-name="{{ asistencia.id_miembro.nombre|lower }} {{ asistencia.id_miembro.apellido|lower }}">
+                                    <div class="member-info">
+                                        <div class="member-avatar">
+                                            {{ asistencia.id_miembro.nombre.0 }}{{ asistencia.id_miembro.apellido.0 }}
+                                        </div>
+                                        <div class="member-details">
+                                            <h6>{{ asistencia.id_miembro.nombre }} {{ asistencia.id_miembro.apellido }}</h6>
+                                            <small>Registrado: {{ asistencia.fecha_registro|date:'d/m/Y H:i' }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="attendance-status">
+                                        <span class="status-badge status-present">
+                                            <i class="fas fa-check"></i> Presente
+                                        </span>
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                onclick="removeAttendance({{ asistencia.id_asistencia }})"
+                                                title="Eliminar asistencia">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay asistentes registrados</h5>
+                                <p class="text-muted">Comienza registrando la asistencia de los miembros.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botones de Acción -->
+                        <div class="action-buttons">
+                            <a href="{% url 'detalle_evento' evento.id_evento %}" class="btn-custom btn-secondary-custom">
+                                <i class="fas fa-arrow-left"></i>
+                                Volver al Evento
+                            </a>
+                            <a href="{% url 'listar_eventos' %}" class="btn-custom btn-secondary-custom">
+                                <i class="fas fa-calendar"></i>
+                                Ver Todos los Eventos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función de búsqueda
+        document.getElementById('searchBox').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const memberItems = document.querySelectorAll('.member-item');
+            
+            memberItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Función para eliminar asistencia
+        function removeAttendance(asistenciaId) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta asistencia?')) {
+                // Aquí se haría una petición AJAX para eliminar la asistencia
+                // Por ahora, recargamos la página
+                window.location.href = window.location.href + '?remove=' + asistenciaId;
+            }
+        }
+        
+        // Validación del formulario
+        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+            const miembro = document.getElementById('id_id_miembro').value;
+            
+            if (!miembro) {
+                e.preventDefault();
+                alert('Por favor, selecciona un miembro.');
+                return;
+            }
+        });
+        
+        // Auto-refresh cada 30 segundos para mantener la lista actualizada
+        setInterval(function() {
+            // Solo si no hay cambios pendientes
+            if (!document.querySelector('form:invalid')) {
+                location.reload();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

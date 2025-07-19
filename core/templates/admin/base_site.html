@@ -1,0 +1,388 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | ⛪ Sistema Iglesia{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" style="text-decoration: none; color: inherit;">
+        <h1 style="margin: 0; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            ⛪ Sistema de Gestión Iglesia
+        </h1>
+        <p style="margin: 0; font-size: 0.9rem; color: #64748b; font-weight: 500;">🎛️ Panel de Administración Avanzado</p>
+    </a>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Variables CSS para el Admin */
+    :root {
+        --admin-primary: #667eea;
+        --admin-secondary: #764ba2;
+        --admin-success: #10b981;
+        --admin-warning: #f59e0b;
+        --admin-danger: #ef4444;
+        --admin-info: #3b82f6;
+        --admin-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --admin-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        --admin-border-radius: 12px;
+    }
+
+    /* Header personalizado */
+    #header {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        box-shadow: var(--admin-shadow);
+        border-bottom: none !important;
+        padding: 1rem 2rem !important;
+    }
+
+    #branding {
+        color: white !important;
+    }
+
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: white !important;
+        font-weight: 800 !important;
+        font-size: 1.8rem !important;
+    }
+
+    /* User tools */
+    #user-tools {
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    #user-tools a {
+        color: white !important;
+        text-decoration: none !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+        margin-left: 0.5rem !important;
+    }
+
+    #user-tools a:hover {
+        background: rgba(255,255,255,0.2) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: #f8fafc !important;
+        border: none !important;
+        padding: 1rem 2rem !important;
+        border-radius: 0 !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+    }
+
+    .breadcrumbs a {
+        color: var(--admin-primary) !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+    }
+
+    .breadcrumbs a:hover {
+        color: var(--admin-secondary) !important;
+    }
+
+    /* Content area */
+    #content {
+        padding: 2rem !important;
+        background: #f8fafc !important;
+        min-height: calc(100vh - 120px) !important;
+    }
+
+    /* Main content */
+    .main {
+        background: white !important;
+        border-radius: var(--admin-border-radius) !important;
+        box-shadow: var(--admin-shadow) !important;
+        padding: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    /* Dashboard modules */
+    .module {
+        background: white !important;
+        border: none !important;
+        border-radius: var(--admin-border-radius) !important;
+        box-shadow: var(--admin-shadow) !important;
+        margin-bottom: 2rem !important;
+        overflow: hidden !important;
+    }
+
+    .module h2 {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        padding: 1.5rem 2rem !important;
+        margin: 0 !important;
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        border-radius: 0 !important;
+    }
+
+    .module h3 {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        padding: 1rem 2rem !important;
+        margin: 0 !important;
+        font-weight: 600 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    /* Tables */
+    .results {
+        border: none !important;
+        border-radius: var(--admin-border-radius) !important;
+        overflow: hidden !important;
+        box-shadow: var(--admin-shadow) !important;
+    }
+
+    .results th {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        padding: 1rem !important;
+        font-weight: 600 !important;
+        border: none !important;
+    }
+
+    .results td {
+        padding: 1rem !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .results tbody tr:hover {
+        background: #f8fafc !important;
+    }
+
+    /* Buttons */
+    .button, input[type=submit], input[type=button], .submit-row input, button {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.8rem 1.5rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+        color: white !important;
+    }
+
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: var(--admin-success) !important;
+    }
+
+    .button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3) !important;
+    }
+
+    /* Delete button */
+    .deletelink {
+        background: var(--admin-danger) !important;
+    }
+
+    .deletelink:hover {
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3) !important;
+    }
+
+    /* Form fields */
+    input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], input[type=tel], textarea, select {
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 0.8rem !important;
+        transition: all 0.3s ease !important;
+        font-size: 1rem !important;
+    }
+
+    input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus, textarea:focus, select:focus {
+        border-color: var(--admin-primary) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        outline: none !important;
+    }
+
+    /* Fieldsets */
+    fieldset {
+        border: 2px solid #e2e8f0 !important;
+        border-radius: var(--admin-border-radius) !important;
+        padding: 1.5rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    fieldset h2 {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        padding: 0.8rem 1.5rem !important;
+        margin: -1.5rem -1.5rem 1.5rem -1.5rem !important;
+        border-radius: var(--admin-border-radius) var(--admin-border-radius) 0 0 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+    }
+
+    /* Messages */
+    .messagelist {
+        margin: 0 0 2rem 0 !important;
+        padding: 0 !important;
+    }
+
+    .messagelist li {
+        background: var(--admin-success) !important;
+        color: white !important;
+        padding: 1rem 1.5rem !important;
+        border-radius: var(--admin-border-radius) !important;
+        margin-bottom: 1rem !important;
+        font-weight: 600 !important;
+        box-shadow: var(--admin-shadow) !important;
+    }
+
+    .messagelist .error {
+        background: var(--admin-danger) !important;
+    }
+
+    .messagelist .warning {
+        background: var(--admin-warning) !important;
+    }
+
+    .messagelist .info {
+        background: var(--admin-info) !important;
+    }
+
+    /* Pagination */
+    .paginator {
+        background: white !important;
+        border: none !important;
+        border-radius: var(--admin-border-radius) !important;
+        box-shadow: var(--admin-shadow) !important;
+        padding: 1rem !important;
+        margin: 2rem 0 !important;
+    }
+
+    .paginator a, .paginator .this-page {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+        margin: 0 0.25rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .paginator a:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    }
+
+    /* Filters */
+    #changelist-filter {
+        background: white !important;
+        border: none !important;
+        border-radius: var(--admin-border-radius) !important;
+        box-shadow: var(--admin-shadow) !important;
+        padding: 1.5rem !important;
+    }
+
+    #changelist-filter h2 {
+        background: var(--admin-gradient) !important;
+        color: white !important;
+        padding: 1rem 1.5rem !important;
+        margin: -1.5rem -1.5rem 1.5rem -1.5rem !important;
+        border-radius: var(--admin-border-radius) var(--admin-border-radius) 0 0 !important;
+        font-weight: 600 !important;
+    }
+
+    #changelist-filter h3 {
+        color: #334155 !important;
+        font-weight: 600 !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    #changelist-filter a {
+        color: var(--admin-primary) !important;
+        text-decoration: none !important;
+        padding: 0.3rem 0 !important;
+        display: block !important;
+        transition: all 0.3s ease !important;
+    }
+
+    #changelist-filter a:hover {
+        color: var(--admin-secondary) !important;
+        padding-left: 0.5rem !important;
+    }
+
+    #changelist-filter a.selected {
+        color: var(--admin-secondary) !important;
+        font-weight: 600 !important;
+    }
+
+    /* Actions */
+    .actions {
+        background: white !important;
+        border: none !important;
+        border-radius: var(--admin-border-radius) !important;
+        box-shadow: var(--admin-shadow) !important;
+        padding: 1rem 1.5rem !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .actions select {
+        margin-right: 1rem !important;
+    }
+
+    /* Dashboard icons */
+    .app-core .model-miembro:before { content: "👤 "; }
+    .app-core .model-grupo:before { content: "👥 "; }
+    .app-core .model-contribucion:before { content: "💰 "; }
+    .app-core .model-evento:before { content: "📅 "; }
+    .app-core .model-certificado:before { content: "📜 "; }
+    .app-core .model-tipocertificado:before { content: "📋 "; }
+    .app-core .model-configuracioncomunicacion:before { content: "⚙️ "; }
+    .app-core .model-listadistribucion:before { content: "📧 "; }
+    .app-core .model-mensaje:before { content: "💬 "; }
+
+    /* Dashboard links */
+    .app-core .model-miembro a, .app-core .model-grupo a, .app-core .model-contribucion a,
+    .app-core .model-evento a, .app-core .model-certificado a, .app-core .model-tipocertificado a,
+    .app-core .model-configuracioncomunicacion a, .app-core .model-listadistribucion a, .app-core .model-mensaje a {
+        font-weight: 600 !important;
+        color: #334155 !important;
+        text-decoration: none !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .app-core .model-miembro a:hover, .app-core .model-grupo a:hover, .app-core .model-contribucion a:hover,
+    .app-core .model-evento a:hover, .app-core .model-certificado a:hover, .app-core .model-tipocertificado a:hover,
+    .app-core .model-configuracioncomunicacion a:hover, .app-core .model-listadistribucion a:hover, .app-core .model-mensaje a:hover {
+        color: var(--admin-primary) !important;
+        padding-left: 0.5rem !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        #header {
+            padding: 1rem !important;
+        }
+        
+        #content {
+            padding: 1rem !important;
+        }
+        
+        .main {
+            padding: 1rem !important;
+        }
+    }
+</style>
+{% endblock %}

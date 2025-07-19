@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Crear Plantilla de Mensaje{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-alt"></i>
+                        Crear Nueva Plantilla de Mensaje
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="{{ form.nombre.id_for_label }}">Nombre de la Plantilla *</label>
+                                    {{ form.nombre }}
+                                    {% if form.nombre.errors %}
+                                        <div class="text-danger">{{ form.nombre.errors }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Ejemplo: "Bienvenida Nuevos Miembros"</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.tipo.id_for_label }}">Tipo</label>
+                                    {{ form.tipo }}
+                                    {% if form.tipo.errors %}
+                                        <div class="text-danger">{{ form.tipo.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.asunto.id_for_label }}">Asunto del Mensaje *</label>
+                            {{ form.asunto }}
+                            {% if form.asunto.errors %}
+                                <div class="text-danger">{{ form.asunto.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Ejemplo: "Bienvenido {{nombre}} a nuestra iglesia"</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.contenido_html.id_for_label }}">Contenido del Mensaje *</label>
+                            {{ form.contenido_html }}
+                            {% if form.contenido_html.errors %}
+                                <div class="text-danger">{{ form.contenido_html.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Usa {{nombre}}, {{apellido}}, {{email}}, {{telefono}} para personalizar</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.descripcion.id_for_label }}">Descripción (opcional)</label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger">{{ form.descripcion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                {{ form.activa }}
+                                <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                                    Plantilla activa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Crear Plantilla
+                            </button>
+                            <a href="{% url 'listar_plantillas_mensaje' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Ejemplo de uso -->
+                    <div class="mt-4 p-3 bg-light border rounded">
+                        <h6><i class="fas fa-lightbulb"></i> Ejemplo práctico:</h6>
+                        <p><strong>Nombre:</strong> Bienvenida Nuevos Miembros</p>
+                        <p><strong>Asunto:</strong> ¡Bienvenido {{nombre}} a nuestra familia!</p>
+                        <p><strong>Contenido:</strong></p>
+                        <div class="bg-white p-2 border">
+                            Estimado/a {{nombre}} {{apellido}},<br><br>
+                            ¡Nos alegra mucho tenerte en nuestra iglesia!<br><br>
+                            Si tienes alguna pregunta, no dudes en contactarnos al {{telefono}} o escribirnos a {{email}}.<br><br>
+                            Bendiciones,<br>
+                            Equipo Pastoral
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
