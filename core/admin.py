@@ -6,7 +6,8 @@ from django.shortcuts import render
 from django.db.models import Count, Sum
 from .models import (
     Miembro, Grupo, Contribucion, Evento, Certificado, TipoCertificado,
-    ConfiguracionComunicacion, ListaDistribucion, Mensaje
+    ConfiguracionComunicacion, ListaDistribucion, Mensaje, PlantillaMensaje,
+    Notificacion, SeguimientoEnvio
 )
 
 class CustomAdminSite(AdminSite):
