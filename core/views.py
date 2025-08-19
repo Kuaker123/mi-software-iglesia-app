@@ -38,45 +38,45 @@ from .forms import (AsistenciaEventoForm, CertificadoForm, ConfiguracionComunica
 
 @login_required
 @require_role(['observador', 'editor', 'admin'])
-def listar_miembros(request):
-    """Lista todos los miembros con filtros y paginación optimizada"""
+def listar_miembros(request):\
+    \"\"\"Lista todos los miembros con filtros y paginación optimizada\"\"\"\
     # Optimización: usar select_related para evitar N+1 queries
-    miembros = Miembro.objects.select_related().all()
-    
+    miembros = Miembro.objects.select_related().all()\
+
     # Filtros
-    estado_filtro = request.GET.get('estado', '')
-    busqueda = request.GET.get('busqueda', '')
-    
-    if estado_filtro:
-        miembros = miembros.filter(estado=estado_filtro)
-    
-    if busqueda:
-        miembros = miembros.filter(
-            Q(nombre__icontains=busqueda) |
-            Q(apellido__icontains=busqueda) |
-            Q(email__icontains=busqueda)
-        )
-    
+    estado_filtro = request.GET.get(\'estado\', \'\')
+    busqueda = request.GET.get(\'busqueda\', \'\')
+
+    if estado_filtro:\
+        miembros = miembros.filter(estado=estado_filtro)\
+
+    if busqueda:\
+        miembros = miembros.filter(\
+            Q(nombre__icontains=busqueda) |\
+            Q(apellido__icontains=busqueda) |\
+            Q(email__icontains=busqueda)\
+        )\
+
     # Estadísticas optimizadas
-    stats = Miembro.objects.aggregate(
-        total=Count('id'),
-        activos=Count('id', filter=Q(estado='Activo')),
-        inactivos=Count('id', filter=Q(estado='Inactivo'))
-    )
-    
+    stats = Miembro.objects.aggregate(\
+        total=Count(\'id_miembro\'),  # Corregido: usar 'id_miembro'
+        activos=Count(\'id_miembro\', filter=Q(estado=\'Activo\')),\
+        inactivos=Count(\'id_miembro\', filter=Q(estado=\'Inactivo\'))\
+    )\
+
     # Paginación
-    paginator = Paginator(miembros, 25)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        'miembros': page_obj,
-        'stats': stats,
-        'estado_filtro': estado_filtro,
-        'busqueda': busqueda,
-    }
-    
-    return render(request, 'core/miembros/listar_miembros.html', context)
+    paginator = Paginator(miembros, 25)\
+    page_number = request.GET.get(\'page\')
+    page_obj = paginator.get_page(page_number)\
+
+    context = {\
+        \'miembros\': page_obj,\
+        \'stats\': stats,\
+        \'estado_filtro\': estado_filtro,\
+        \'busqueda\': busqueda,\
+    }\
+
+    return render(request, \'core/miembros/listar_miembros.html\', context)\
 
 @login_required
 @editor_required

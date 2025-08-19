@@ -10,7 +10,7 @@ urlpatterns = [
     path('auth/usuarios/<int:user_id>/toggle/', auth_views.toggle_usuario_estado, name='toggle_usuario_estado'),
     
     # Dashboards por rol
-    path('dashboard/', auth_views.dashboard_view, name='dashboard'),
+    #path('dashboard/', auth_views.dashboard_view, name='dashboard'),
     path('admin-dashboard/', auth_views.admin_dashboard, name='admin_dashboard'),
     path('editor-dashboard/', auth_views.editor_dashboard, name='editor_dashboard'),
     path('observador-dashboard/', auth_views.observador_dashboard, name='observador_dashboard'),

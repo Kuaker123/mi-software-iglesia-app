@@ -236,7 +236,7 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 # Custom user model
 AUTH_USER_MODEL = 'core.Usuario'
 LOGIN_URL = '/core/auth/login/'
-LOGIN_REDIRECT_URL = '/core/dashboard/'
+LOGIN_REDIRECT_URL = '/core/' # O la URL correcta de tu dashboard principal si no es '/core/'
 LOGOUT_REDIRECT_URL = '/core/auth/login/'
 
 # Security settings for production

@@ -64,11 +64,11 @@ def role_based_redirect(user):
     Función auxiliar para redirección inteligente basada en rol
     """
     if not hasattr(user, 'rol'):
-        return '/dashboard/'
-    
+        return '/core/'  # Redirigir al dashboard principal si no tiene rol
+
     if user.rol == 'admin':
         return '/admin-dashboard/'
     elif user.rol == 'editor':
         return '/editor-dashboard/'
-    else:
-        return '/observador-dashboard/'
+    else:  # Rol 'observador' o cualquier otro rol no admin/editor
+        return '/core/'  # Redirigir al dashboard principal
