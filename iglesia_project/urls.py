@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
-from core.admin import custom_admin_site
+
+def redirect_to_admin(request):
+    return redirect('/admin/')
 
 urlpatterns = [
-    path('admin/', custom_admin_site.urls),
-    path('core/', include('core.urls')),  # Ya está correcto
-    path('', lambda request: redirect('/core/')),  # Cambio menor aquí
+    path('admin/', admin.site.urls),
+    path('', redirect_to_admin),  # Redirige la página principal al admin
+    path('core/', include('core.urls')),
 ]
