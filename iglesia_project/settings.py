@@ -82,21 +82,42 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'iglesia_project.wsgi.application'
-
 # Database
 # Configuración para usar DATABASE_URL en producción y SQLite en desarrollo
+
+import logging
+logger = logging.getLogger(__name__)
+
 if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-    }
+    logger.info("DATABASE_URL found in environment. Attempting to use PostgreSQL configuration.")
+    database_url = os.environ.get('DATABASE_URL')
+    logger.info(f"DATABASE_URL value: {database_url}")
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(database_url)
+        }
+        logger.info(f"Successfully parsed DATABASE_URL. DATABASES config: {DATABASES}")
+    except Exception as e:
+        logger.error(f"Error parsing DATABASE_URL: {e}", exc_info=True)
+        # Si falla el parsing, puedes decidir si quieres caer a SQLite o fallar el despliegue
+        # Aquí optamos por caer a SQLite para ver si la app al menos inicia
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+        logger.warning("Falling back to SQLite due to DATABASE_URL parsing error.")
 else:
     # Usar SQLite por defecto para desarrollo
+    logger.warning("DATABASE_URL not found in environment. Falling back to SQLite.")
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
 
 # Configuración de Cache con Redis
 if env('USE_REDIS', default=False):
