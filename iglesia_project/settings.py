@@ -1,10 +1,13 @@
 """
 Django settings for iglesia_project project.
+
+versión actualizada - version1
 """
 
 from pathlib import Path
 import environ
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,8 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure--f+h*mc%&1q3b-j!@r$)pm5+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='').split(',') if env('ALLOWED_HOSTS', default='') else []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+print(f"DEBUG: ALLOWED_HOSTS is {ALLOWED_HOSTS}")
 
 # Application definition
 INSTALLED_APPS = [
@@ -59,9 +63,13 @@ ROOT_URLCONF = 'iglesia_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'], # Puedes agregar directorios de templates a nivel de proyecto aquí
+        'APP_DIRS': False, # Ya no se usa si defines loaders
         'OPTIONS': {
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -72,46 +80,23 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'iglesia_project.wsgi.application'
 
 # Database
-# Database
-# Configuración de base de datos mejorada
-if env('USE_POSTGRESQL', default=False):
+# Configuración para usar DATABASE_URL en producción y SQLite en desarrollo
+if 'DATABASE_URL' in os.environ:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME', default='iglesia_db'),
-            'USER': env('DB_USER', default='iglesia_user'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST', default='localhost'),
-            'PORT': env('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'connect_timeout': 10,
-                'options': '-c default_transaction_isolation=read_committed'
-            },
-            'CONN_MAX_AGE': 600,
-            'CONN_HEALTH_CHECKS': True,
-        }
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
 else:
+    # Usar SQLite por defecto para desarrollo
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
-            'OPTIONS': {
-                'timeout': 20,
-                'check_same_thread': False,
-            }
         }
     }
-
-# Configuración de pool de conexiones para PostgreSQL
-if env('USE_POSTGRESQL', default=False):
-    DATABASES['default']['OPTIONS'].update({
-        'MAX_CONNS': 20,
-        'MIN_CONNS': 5,
-    })
 
 # Configuración de Cache con Redis
 if env('USE_REDIS', default=False):
@@ -141,7 +126,7 @@ if env('USE_REDIS', default=False):
             'TIMEOUT': 86400,  # 24 horas
         }
     }
-    
+
     # Usar Redis para sesiones
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     SESSION_CACHE_ALIAS = 'sessions'
@@ -157,49 +142,35 @@ else:
             }
         }
     }
-    
+
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     SESSION_CACHE_ALIAS = 'default'
 
-# Configuración de cache para templates
-if not DEBUG:
-    TEMPLATES[0]['OPTIONS']['loaders'] = [
-        ('django.template.loaders.cached.Loader', [
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-        ]),
-    ]
 
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_AGE = 3600  # 1 hora
 
+
 # Configuración de archivos estáticos mejorada
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     BASE_DIR / 'core' / 'static',
+    # Agrega aquí otros directorios de estáticos a nivel de proyecto si los tienes
 ]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Configuración de archivos media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
-# Para producción con MySQL, descomenta esto:
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': env('DB_NAME', default='mi_software_iglesia'),
-#         'USER': env('DB_USER', default='django_user'),
-#         'PASSWORD': env('DB_PASSWORD', default='nueva_contraseña'),
-#         'HOST': env('DB_HOST', default='127.0.0.1'),
-#         'PORT': env('DB_PORT', default='3306'),
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#         }
-#     }
-# }
 
-# Configurar PyMySQL como reemplazo de MySQLdb
+# Configurar PyMySQL como reemplazo de MySQLdb (si usas MySQL en algún momento)
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
@@ -228,26 +199,18 @@ TIME_ZONE = env('TIME_ZONE', default='America/Mexico_City')
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='')
 EMAIL_PORT = env('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+#EMAIL_USE_SSL = env('EMAIL_USE_SSL', default=False) # Si usas SSL en lugar de TLS
 
 # Custom user model
 AUTH_USER_MODEL = 'core.Usuario'
@@ -260,9 +223,12 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_SECONDS = 31536000 # 1 año en segundos
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    #SECURE_SSL_REDIRECT = True # Descomentar si fuerzas HTTPS a nivel de Django
 
 # Logging avanzado
 LOGGING = {
@@ -362,126 +328,3 @@ LOGGING = {
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
-
-# Configuración de producción
-import os
-from pathlib import Path
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
-
-# Hosts permitidos
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.herokuapp.com',  # Para Heroku
-    os.environ.get('ALLOWED_HOST', ''),
-]
-
-# Base de datos para producción
-# Database - Configuración actualizada para Railway
-import dj_database_url
-
-if env('USE_MYSQL', default=False) or 'DATABASE_URL' in os.environ:
-    # Configuración para Railway con MySQL
-    if 'DATABASE_URL' in os.environ:
-        DATABASES = {
-            'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-        }
-    else:
-        # Configuración manual de MySQL
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.mysql',
-                'NAME': env('DB_NAME', default='mi_software_iglesia'),
-                'USER': env('DB_USER', default='django_user'),
-                'PASSWORD': env('DB_PASSWORD', default=''),
-                'HOST': env('DB_HOST', default='127.0.0.1'),
-                'PORT': env('DB_PORT', default='3306'),
-                'OPTIONS': {
-                    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                    'charset': 'utf8mb4',
-                },
-                'CONN_MAX_AGE': 600,
-            }
-        }
-elif env('USE_POSTGRESQL', default=False):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME', default='iglesia_db'),
-            'USER': env('DB_USER', default='iglesia_user'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST', default='localhost'),
-            'PORT': env('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'connect_timeout': 10,
-                'options': '-c default_transaction_isolation=read_committed'
-            },
-            'CONN_MAX_AGE': 600,
-            'CONN_HEALTH_CHECKS': True,
-        }
-    }
-else:
-    # Comentar la configuración de MySQL temporalmente
-    if os.getenv('DATABASE_URL'):
-        DATABASES = {
-            'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
-        }
-    else:
-        # Usar SQLite por defecto (más simple para empezar)
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
-
-# Configuración de archivos estáticos para producción
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'core/static'),
-]
-
-# Configuración de archivos media
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Configuración de email para producción
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
-
-# Configuración de seguridad
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-
-# Configuración de logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
