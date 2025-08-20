@@ -3,11 +3,23 @@ Django settings for iglesia_project project.
 
 versión actualizada - version1
 """
-
 from pathlib import Path
 import environ
 import os
 import dj_database_url
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.info("Checking environment variables at the start of settings.py")
+logger.info(f"os.environ keys: {list(os.environ.keys())}")
+if 'DATABASE_URL' in os.environ:
+    logger.info("DATABASE_URL found in os.environ at the start!")
+    # Opcional: logear el valor (con cuidado de no exponer credenciales sensibles)
+    # logger.info(f"DATABASE_URL value at start: {os.environ.get('DATABASE_URL')}")
+else:
+    logger.warning("DATABASE_URL NOT found in os.environ at the start!")
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
